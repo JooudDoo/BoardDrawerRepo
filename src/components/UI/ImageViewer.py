@@ -1,8 +1,8 @@
 import numpy as np
 import cv2
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import Qt, QRunnable, QThreadPool, QMetaObject, QObject, pyqtSignal, QTimer
-from PyQt5.QtWidgets import QMainWindow, QWidget, QApplication, QHBoxLayout, QVBoxLayout, QLabel, QGraphicsScene, QPushButton, QGraphicsPixmapItem, QAction
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QAction
 
 class ImageViewer(QtWidgets.QLabel):
     # Переделать логику ресайза

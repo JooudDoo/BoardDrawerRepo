@@ -1,14 +1,12 @@
 import sys
 
-import numpy as np
-import cv2
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import Qt, QRunnable, QThreadPool, QMetaObject, QObject, pyqtSignal, QTimer
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QMainWindow, QWidget, QApplication, QHBoxLayout, QVBoxLayout, QPushButton
 
 from components.CameraHandler import CameraHandler, CameraSettings
 from components.UI.ImageViewer import ImageViewer, ImageViewerWindow
-from components.UI.ImageViewer import RangeSlider
+from components.UI.RangeSlider import RangeSlider
 from components.UI.RangeSliderLabel import RangeSliderLabel
 
 def runGUI():
