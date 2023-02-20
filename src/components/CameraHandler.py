@@ -211,14 +211,13 @@ class CameraHandler():
         dM10 = moments['m10']
         dArea = moments['m00']
 
-        x = self.save_x
-        y = self.save_y
-        if dArea > 100:
+        x = 0
+        y = 0
+        if dArea > 10:
             x = int(dM10 / dArea)
             y = int(dM01 / dArea)
-            cv2.circle(img, (x, y), 10, self.circle_color, 1)
-        
-        if self.save_x > 0 and self.save_y > 0:
+            
+        if self.save_x > 0 and self.save_y > 0 and x > 0 and y > 0:
             cv2.line(self.path, (self.save_x, self.save_y), (x, y), self.line_color, 5)
 
         self.save_x = x
