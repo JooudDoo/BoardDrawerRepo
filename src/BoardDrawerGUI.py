@@ -75,7 +75,6 @@ class SettingsBar(QWidget):
 
     def _createRangeSliders(self, parent):
         grLayout = QtWidgets.QGridLayout(parent)
-        print(self.cameraSettings)
         minRangeLabel = RangeSliderLabel("MinRange", self._camera.settings.minRange)
         if self._camera.settings.rangeType == 'HSL':
             colors = ['hue', 'saturation', 'lightness']

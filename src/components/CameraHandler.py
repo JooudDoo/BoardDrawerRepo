@@ -124,6 +124,14 @@ class CameraHandler():
     def __init__(self, videoStreamSource = 0, settings : CameraSettings = None):
         self._videoStream = cv2.VideoCapture(videoStreamSource)
         self.setupSettings(settings)
+
+
+        # ----- Настройки цветов ВРЕМЕННОЕ
+        self.circle_color = (0,0,0)
+        self.line_color = (0, 255, 255)
+        self.save_x = 0
+        self.save_y = 0
+        self.path = CameraHandler.createPath(self.getImage())
     
     def setupSettings(self, settings : CameraSettings):
         if settings == None:
@@ -156,8 +164,9 @@ class CameraHandler():
     def getProcessedImage(self, size : tuple[int, int] = (0, 0)):
         frame = self.getImage(size)
         mask = self.getColorRangeMask(frame)
-        rangedImage = self.applyMaskOnImage(frame, mask)
-        return rangedImage
+        rangedImage = self.getMoments(frame, mask)
+        maskedImage = self.applyMaskOnImage(frame, mask)
+        return cv2.add(maskedImage, rangedImage)
 
     def getColorRangeMask(self, img : cv2.Mat, reduceBy : int = 5) -> cv2.Mat:
         """
@@ -188,3 +197,31 @@ class CameraHandler():
 
     def __del__(self):
         self._videoStream.release()
+
+
+    # РИСОВКА ВРЕМЕННОЕ ----
+    @staticmethod
+    def createPath(img):
+        h, w = img.shape[:2]
+        return np.zeros((h, w, 3), np.uint8)
+
+    def getMoments(self, img, thresh):
+        moments = cv2.moments(thresh, 1)
+        dM01 = moments['m01']
+        dM10 = moments['m10']
+        dArea = moments['m00']
+
+        x = self.save_x
+        y = self.save_y
+        if dArea > 100:
+            x = int(dM10 / dArea)
+            y = int(dM01 / dArea)
+            cv2.circle(img, (x, y), 10, self.circle_color, 1)
+        
+        if self.save_x > 0 and self.save_y > 0:
+            cv2.line(self.path, (self.save_x, self.save_y), (x, y), self.line_color, 5)
+
+        self.save_x = x
+        self.save_y = y
+
+        return cv2.add(img, self.path)
