@@ -75,18 +75,22 @@ class SettingsBar(QWidget):
 
     def _createRangeSliders(self, parent):
         grLayout = QtWidgets.QGridLayout(parent)
-        
-        minRangeLabel = RangeSliderLabel("MinRange", self.cameraSettings.minRangeRGB)
+        print(self.cameraSettings)
+        minRangeLabel = RangeSliderLabel("MinRange", self._camera.settings.minRange)
+        if self._camera.settings.rangeType == 'HSL':
+            colors = ['hue', 'saturation', 'lightness']
+        elif self._camera.settings.rangeType == 'RGB': 
+            colors = ['red', 'green', 'blue']
         grLayout.addWidget(minRangeLabel, 0, 0)
-        grLayout.addWidget(RangeSlider().setup(255, self.updateCameraSettings, self.cameraSettings.minRangeRGB, 'red', minRangeLabel), 1, 0)
-        grLayout.addWidget(RangeSlider().setup(255, self.updateCameraSettings, self.cameraSettings.minRangeRGB, 'green', minRangeLabel), 2, 0)
-        grLayout.addWidget(RangeSlider().setup(255, self.updateCameraSettings, self.cameraSettings.minRangeRGB, 'blue', minRangeLabel), 3, 0)
+        grLayout.addWidget(RangeSlider().setup(255, self.updateCameraSettings, self._camera.settings.minRange, colors[0], minRangeLabel), 1, 0)
+        grLayout.addWidget(RangeSlider().setup(255, self.updateCameraSettings, self._camera.settings.minRange, colors[1], minRangeLabel), 2, 0)
+        grLayout.addWidget(RangeSlider().setup(255, self.updateCameraSettings, self._camera.settings.minRange, colors[2], minRangeLabel), 3, 0)
 
-        maxRangeLabel = RangeSliderLabel("MaxRange", self.cameraSettings.maxRangeRGB)
+        maxRangeLabel = RangeSliderLabel("MaxRange", self._camera.settings.maxRange)
         grLayout.addWidget(maxRangeLabel, 0, 1)
-        grLayout.addWidget(RangeSlider().setup(255, self.updateCameraSettings, self.cameraSettings.maxRangeRGB, 'red', maxRangeLabel), 1, 1)
-        grLayout.addWidget(RangeSlider().setup(255, self.updateCameraSettings, self.cameraSettings.maxRangeRGB, 'green', maxRangeLabel), 2, 1)
-        grLayout.addWidget(RangeSlider().setup(255, self.updateCameraSettings, self.cameraSettings.maxRangeRGB, 'blue', maxRangeLabel), 3, 1)
+        grLayout.addWidget(RangeSlider().setup(255, self.updateCameraSettings, self._camera.settings.maxRange, colors[0], maxRangeLabel), 1, 1)
+        grLayout.addWidget(RangeSlider().setup(255, self.updateCameraSettings, self._camera.settings.maxRange, colors[1], maxRangeLabel), 2, 1)
+        grLayout.addWidget(RangeSlider().setup(255, self.updateCameraSettings, self._camera.settings.maxRange, colors[2], maxRangeLabel), 3, 1)
     
     def _createImportExportBtns(self, parent):
         layout = QtWidgets.QHBoxLayout(parent)

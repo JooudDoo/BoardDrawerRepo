@@ -4,11 +4,16 @@ from contextlib import suppress
 import cv2
 import numpy as np
 
+class ColorContainer():
+    def __init__():
+        pass
+
 @dataclass
-class RGB():
+class RGB(ColorContainer):
     """
     Класс содержащий значения RGB
     """
+    name : str = "RGB"
     red : int = 0
     green : int = 0
     blue : int = 0
@@ -27,13 +32,45 @@ class RGB():
         Обновляет поле в классе, а также сохрянет достоверность массива 'rgb'
         """
         object.__setattr__(self, name, val)
-        with suppress (RecursionError): self.rgb = (self.red, self.green, self.blue)
+        with suppress (RecursionError): self.color = (self.red, self.green, self.blue)
         
     def __str__(self):
         return f"[R: {self.red}, G: {self.green}, B: {self.blue}]"
     
     def maximizedString(self):
         return f"[R: 255, G: 255, B: 255]"
+
+@dataclass
+class HSL(ColorContainer):
+    """
+    Класс содержащий значения HLS
+    """
+    name : str = "HSL"
+    hue : int = 0
+    saturation : int = 0
+    lightness : int = 0
+
+    def __init__(self, hue = 0, saturation = 0, lightness = 0, hsl = ()):
+        if hsl:
+            self.hue, self.saturation, self.lightness = hsl[0], hsl[1], hsl[2]
+        else:
+            self.hue, self.saturation, self.lightness = hue, saturation, lightness
+    
+    def _updateColorByName(self, color : str, val):
+        setattr(self, color, val)
+
+    def __setattr__(self, name, val):
+        """
+        Обновляет поле в классе, а также сохрянет достоверность массива 'rgb'
+        """
+        object.__setattr__(self, name, val)
+        with suppress (RecursionError): self.color = (self.hue, self.saturation, self.lightness)
+        
+    def __str__(self):
+        return f"[H: {self.hue}, S: {self.saturation}, L: {self.lightness}]"
+    
+    def maximizedString(self):
+        return f"[H: 255, S: 255, L: 255]"
         
 @dataclass
 class CameraSettings():
@@ -42,29 +79,45 @@ class CameraSettings():
 
     Parametrs
     ---------
-    `minRangeRGB` - Минимальные значение RGB для обнаружения их на видео потоке
+    `minRange` - Минимальные значение RGB для обнаружения их на видео потоке
 
-    `maxRangeRGB` - Максимальные значения RGB для обнаружения их на видео потоке
+    `maxRange` - Максимальные значения RGB для обнаружения их на видео потоке
     """
-    minRangeRGB : RGB
-    maxRangeRGB : RGB
+
+    @staticmethod
+    def default():
+        return CameraSettings(rangeType="RGB", minRange=(0,0,0), maxRange=(255,255,255))
+
+    rangeType : str
+    minRange : ColorContainer
+    maxRange : ColorContainer
 
     @staticmethod
     def importFrom(fileName : str):
         with open(fileName, 'r', encoding='utf8') as importFile:
-            minRange = RGB(rgb=[int(x) for x in importFile.readline().split()])
-            maxRange = RGB(rgb=[int(x) for x in importFile.readline().split()])
-
-        settings = CameraSettings(minRangeRGB=minRange,
-                                    maxRangeRGB=maxRange)
+            type = importFile.readline().strip()
+            if type == "RGB":
+                minRange = RGB(rgb=[int(x) for x in importFile.readline().split()])
+                maxRange = RGB(rgb=[int(x) for x in importFile.readline().split()])
+            elif type == "HSL":
+                minRange = HSL(hsl=[int(x) for x in importFile.readline().split()])
+                maxRange = HSL(hsl=[int(x) for x in importFile.readline().split()])
+        try:
+            settings = CameraSettings(
+                    rangeType=type,
+                    minRange=minRange,
+                    maxRange=maxRange,)
+        except:
+            settings = CameraSettings.default()
         return settings
 
     @staticmethod
     def exportTo(settings, fileName : str):
         with open(fileName, 'w', encoding='utf8') as exportFile:
-            [exportFile.write(f"{x} ") for x in settings.minRangeRGB.rgb]
+            exportFile.write(f"{settings.rangeType}\n")
+            [exportFile.write(f"{x} ") for x in settings.minRange.color]
             exportFile.write('\n')
-            [exportFile.write(f"{x} ") for x in settings.maxRangeRGB.rgb]
+            [exportFile.write(f"{x} ") for x in settings.maxRange.color]
 
 class CameraHandler():
 
@@ -74,11 +127,11 @@ class CameraHandler():
     
     def setupSettings(self, settings : CameraSettings):
         if settings == None:
-            self._settings = None
+            self.settings = None
             return
         else:
             # Тут возможно будет верификация настроек
-            self._settings = settings
+            self.settings = settings
     
     def loadSettings(self, fileName):
         """
@@ -91,10 +144,6 @@ class CameraHandler():
         `fileName` - имя файла с настройками
         """
         self.setupSettings(CameraSettings.importFrom(fileName))
-
-    @property
-    def settings(self):
-        return self._settings
 
     def getImage(self, size : tuple[int, int] = (0, 0)):
         checkCode, frame = self._videoStream.read()
@@ -124,8 +173,10 @@ class CameraHandler():
         """
         h, w, _ = img.shape
         imgCopy = cv2.resize(img, (w//reduceBy, h//reduceBy))
+        if self.settings.rangeType == "HSL":
+            imgCopy = cv2.cvtColor(imgCopy, cv2.COLOR_BGR2HLS)
         imgCopy = cv2.GaussianBlur(imgCopy, (5, 5), 0)
-        mask = cv2.inRange(imgCopy, self.settings.minRangeRGB.rgb, self.settings.maxRangeRGB.rgb)
+        mask = cv2.inRange(imgCopy, self.settings.minRange.color, self.settings.maxRange.color)
         mask = cv2.dilate(mask, np.ones((2,2)), iterations=3)
         mask = cv2.resize(mask, (w,h))
         return mask
