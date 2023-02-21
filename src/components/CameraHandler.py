@@ -24,6 +24,7 @@ class CameraSettings():
     rangeType : str
     minRange : ColorContainer
     maxRange : ColorContainer
+    maskReduceBy : int 
 
     @staticmethod
     def importFrom(fileName : str):
@@ -35,11 +36,13 @@ class CameraSettings():
             elif type == "HSL":
                 minRange = HSL(hsl=[int(x) for x in importFile.readline().split()])
                 maxRange = HSL(hsl=[int(x) for x in importFile.readline().split()])
+            maskReduceBy = int(importFile.readline())
         try:
             settings = CameraSettings(
                     rangeType=type,
                     minRange=minRange,
-                    maxRange=maxRange,)
+                    maxRange=maxRange,
+                    maskReduceBy=maskReduceBy)
         except:
             settings = CameraSettings.default()
         return settings
@@ -51,6 +54,8 @@ class CameraSettings():
             [exportFile.write(f"{x} ") for x in settings.minRange.color]
             exportFile.write('\n')
             [exportFile.write(f"{x} ") for x in settings.maxRange.color]
+            exportFile.write('\n')
+            exportFile.write(f"{settings.maskReduceBy}\n")
 
 class CameraHandler():
 
@@ -92,7 +97,7 @@ class CameraHandler():
         maskedFrame = self.applyMaskOnImage(frame, mask)
         return maskedFrame
 
-    def getColorRangeMask(self, img : cv2.Mat, reduceBy : int = 5) -> cv2.Mat:
+    def getColorRangeMask(self, img : cv2.Mat, reduceBy : int = None) -> cv2.Mat:
         """
         Функция возвращающая маску заданного цветового диапазона. Значение маски берется из настроек
 
@@ -104,6 +109,8 @@ class CameraHandler():
 
         `return` - маска изображения
         """
+        if reduceBy == None:
+            reduceBy = self.settings.maskReduceBy
         h, w, _ = img.shape
         imgCopy = cv2.resize(img, (w//reduceBy, h//reduceBy))
         if self.settings.rangeType == "HSL":

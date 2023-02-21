@@ -4,6 +4,28 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QAction
 
+class FPSMeter(QtWidgets.QLabel):
+    def __init__(self,  *args, **kwargs):
+        super(FPSMeter, self).__init__( *args, **kwargs)
+        self.paddingLeft = 5
+        self.paddingTop = 5
+        self.setText("")
+    
+    def updatePosition(self):
+        if hasattr(self.parent(), 'viewport'):
+            parentRect = self.parent().viewport().rect()
+        else:
+            parentRect = self.parent().rect()
+        if not parentRect: return
+
+        x = parentRect.width() - self.width() - self.paddingLeft
+        y = self.paddingTop
+        self.setGeometry(x, y, self.width(), self.height())
+    
+    def resizeEvent(self, a0: QtGui.QResizeEvent) -> None:
+        super().resizeEvent(a0)
+        self.updatePosition()
+
 class ImageViewer(QtWidgets.QLabel):
     # Переделать логику ресайза
     def __init__(self,  *args, **kwargs):
@@ -14,11 +36,19 @@ class ImageViewer(QtWidgets.QLabel):
         except:
             self.defaultImage = np.zeros((360, 360, 3))
         self.setPixmap(self.defaultImage)
+        self.FPSMeter = FPSMeter(parent=self)
         
+    def setFPSMeterFPS(self, fps : float):
+        self.FPSMeter.setText(f"FPS: {round(fps, 2)}")
+
     def setPixmap(self, pixmap):
         super(ImageViewer, self).setPixmap(pixmap.scaled(
             self.width()-25, self.height()-20,
             QtCore.Qt.KeepAspectRatio))
+    
+    def resizeEvent(self, a0: QtGui.QResizeEvent) -> None:
+        super().resizeEvent(a0)
+        self.FPSMeter.updatePosition()
 
 class ImageViewerWindow(QMainWindow):
 

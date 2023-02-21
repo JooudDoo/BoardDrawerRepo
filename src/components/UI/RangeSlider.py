@@ -7,15 +7,15 @@ class RangeSlider(QSlider):
     def __init__(self, orientation = Qt.Horizontal, parent = None):
         super(RangeSlider, self).__init__(orientation,parent)
     
-    def setup(self, maxValue, updateValFunc, colorContainer, colorName : str, connectedLabel):
+    def setup(self, maxValue : int, updateValFunc, container, containerName : str, connectedLabel, minValue : int = 0):
+        self.setMinimum(minValue)
         self.setMaximum(maxValue)
         self._updateValFunction = updateValFunc
-        self._connectedValue = colorContainer
-        self._containerName = colorName
+        self._connectedValue = container
+        self._containerName = containerName
+        self._updatefunction = lambda x : self._connectedValue.__setattr__(self._containerName, x)
+        self.setValue(getattr(self._connectedValue, self._containerName))
         self._connectedLabel = connectedLabel
-
-        self._updatefunction = lambda x : self._connectedValue._updateColorByName(self._containerName, x)
-        self.setValue(getattr(colorContainer, colorName))
         self._connectedLabel.updateValue()
         self.valueChanged.connect(self.changeFunction)
         return self

@@ -1,4 +1,5 @@
 import sys
+import time
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt, QTimer
@@ -31,13 +32,29 @@ class CustomizerWindow(QMainWindow):
         self._imageViewerSize = (0, 0)
 
         self.setupUi()
+
+        #FPS meter params
+        self._fpsTimerPrev = time.time()
+        self.imageUpdateCycleCount = 10
+        self.imageUpdateCount = 0
+
         self.mainTimer.start()
+
+    def FPSCalculation(self):
+        self.imageUpdateCount += 1
+        if self.imageUpdateCount >= self.imageUpdateCycleCount:
+            sfromPrevUpdate = time.time() - self._fpsTimerPrev
+            self._fpsTimerPrev = time.time()
+            self._currentImageViewer.setFPSMeterFPS(float(1/sfromPrevUpdate*self.imageUpdateCycleCount))
+            self.imageUpdateCount = 0
 
     @QtCore.pyqtSlot()
     def imageUpdate(self):
+        self.FPSCalculation()
         image = self.drawer.drawer(self._imageViewerSize)
         image = QtGui.QImage(image.data, image.shape[1], image.shape[0], QtGui.QImage.Format_RGB888).rgbSwapped()
         self._currentImageViewer.setPixmap(QtGui.QPixmap.fromImage(image))
+        
     
     def setupUi(self):
         self._mainWidget = QWidget(self)
@@ -76,23 +93,29 @@ class SettingsBar(QWidget):
             self._imViewWin.close()
             self._isImageViewerPinned = True
 
-    def _createRangeSliders(self, parent):
+    def _createImageSliders(self, parent):
         grLayout = QtWidgets.QGridLayout(parent)
-        minRangeLabel = RangeSliderLabel("MinRange", self._camera.settings.minRange)
+        
         if self._camera.settings.rangeType == 'HSL':
             colors = ['hue', 'saturation', 'lightness']
         elif self._camera.settings.rangeType == 'RGB': 
             colors = ['red', 'green', 'blue']
-        grLayout.addWidget(minRangeLabel, 0, 0)
-        grLayout.addWidget(RangeSlider().setup(255, self.updateCameraSettings, self._camera.settings.minRange, colors[0], minRangeLabel), 1, 0)
-        grLayout.addWidget(RangeSlider().setup(255, self.updateCameraSettings, self._camera.settings.minRange, colors[1], minRangeLabel), 2, 0)
-        grLayout.addWidget(RangeSlider().setup(255, self.updateCameraSettings, self._camera.settings.minRange, colors[2], minRangeLabel), 3, 0)
 
-        maxRangeLabel = RangeSliderLabel("MaxRange", self._camera.settings.maxRange)
+        minRangeLabel = RangeSliderLabel("MinRange", self.cameraSettings, 'minRange')
+        grLayout.addWidget(minRangeLabel, 0, 0)
+        grLayout.addWidget(RangeSlider().setup(255, self.updateCameraSettings, self.cameraSettings.minRange, colors[0], minRangeLabel), 1, 0)
+        grLayout.addWidget(RangeSlider().setup(255, self.updateCameraSettings, self.cameraSettings.minRange, colors[1], minRangeLabel), 2, 0)
+        grLayout.addWidget(RangeSlider().setup(255, self.updateCameraSettings, self.cameraSettings.minRange, colors[2], minRangeLabel), 3, 0)
+
+        maxRangeLabel = RangeSliderLabel("MaxRange", self.cameraSettings, 'maxRange')
         grLayout.addWidget(maxRangeLabel, 0, 1)
-        grLayout.addWidget(RangeSlider().setup(255, self.updateCameraSettings, self._camera.settings.maxRange, colors[0], maxRangeLabel), 1, 1)
-        grLayout.addWidget(RangeSlider().setup(255, self.updateCameraSettings, self._camera.settings.maxRange, colors[1], maxRangeLabel), 2, 1)
-        grLayout.addWidget(RangeSlider().setup(255, self.updateCameraSettings, self._camera.settings.maxRange, colors[2], maxRangeLabel), 3, 1)
+        grLayout.addWidget(RangeSlider().setup(255, self.updateCameraSettings, self.cameraSettings.maxRange, colors[0], maxRangeLabel), 1, 1)
+        grLayout.addWidget(RangeSlider().setup(255, self.updateCameraSettings, self.cameraSettings.maxRange, colors[1], maxRangeLabel), 2, 1)
+        grLayout.addWidget(RangeSlider().setup(255, self.updateCameraSettings, self.cameraSettings.maxRange, colors[2], maxRangeLabel), 3, 1)
+
+        reduceScaleLabel = RangeSliderLabel("reduceBy", self.cameraSettings, 'maskReduceBy')
+        grLayout.addWidget(reduceScaleLabel, 0, 2)
+        grLayout.addWidget(RangeSlider(orientation=Qt.Vertical).setup(10, self.updateCameraSettings, self.cameraSettings, "maskReduceBy", reduceScaleLabel, minValue=1), 1, 2, 3, 1, Qt.AlignmentFlag.AlignHCenter)
     
     def _createImportExportBtns(self, parent):
         layout = QtWidgets.QHBoxLayout(parent)
@@ -111,19 +134,30 @@ class SettingsBar(QWidget):
     def _createDrawerBtns(self, parent):
         layout = QtWidgets.QHBoxLayout(parent)
 
-        switchModeBtn = QtWidgets.QPushButton(text="no draw")
+        switchDrawModeBtn = QtWidgets.QPushButton(text="Draw")
         cleanCanvasBtn = QtWidgets.QPushButton(text="Clean canvas")
+        showMaskBtn = QtWidgets.QPushButton(text="Show mask")
 
-        def switchModeBtnClicked(btn):
-            if self._drawer.switchMode():
-                switchModeBtn.setText("draw")
+        def switchDrawModeBtnClicked():
+            if self._drawer.switchDrawMode():
+                switchDrawModeBtn.setText("No draw")
             else:
-                switchModeBtn.setText("no draw")
+                switchDrawModeBtn.setText("Draw")
+
         
-        switchModeBtn.clicked.connect(switchModeBtnClicked)
+        def showMaskBtnClicked():
+            if self._drawer.swictchMaskShowMode():
+                showMaskBtn.setText("Hide mask")
+            else:
+                showMaskBtn.setText("Show mask")
+
+        
+        switchDrawModeBtn.clicked.connect(switchDrawModeBtnClicked)
+        showMaskBtn.clicked.connect(showMaskBtnClicked)
         cleanCanvasBtn.clicked.connect(self._drawer.cleanCanvas)
 
-        layout.addWidget(switchModeBtn)
+        layout.addWidget(switchDrawModeBtn)
+        layout.addWidget(showMaskBtn)
         layout.addWidget(cleanCanvasBtn)
         
 
@@ -138,7 +172,7 @@ class SettingsBar(QWidget):
         self._createDrawerBtns(self._drawerButtonsWid)
 
         self._rangeSlidersWid = QWidget()
-        self._createRangeSliders(self._rangeSlidersWid)
+        self._createImageSliders(self._rangeSlidersWid)
 
 
         self._eximBtns = QWidget()

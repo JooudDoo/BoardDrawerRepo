@@ -1,18 +1,16 @@
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtCore import Qt
 
-from ..ColorContainers import ColorContainer
-
 class RangeSliderLabel(QLabel):
 
-    def __init__(self, text, colorContainer : ColorContainer, parent=None):
+    def __init__(self, text, container, fieldName : str, parent=None):
         super(RangeSliderLabel, self).__init__(parent)
-        self.color = colorContainer
+        self.cont = container
+        self.fieldName = fieldName
         self._text = text
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setFixedHeight(25)
-        self.setText(colorContainer.maximizedString())
         self.setMinimumWidth(123)
 
     def updateValue(self):
-        self.setText(f"{self._text}\n{str(self.color)}")
+        self.setText(f"{self._text}\n{str(getattr(self.cont, self.fieldName))}")
