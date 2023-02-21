@@ -1,5 +1,5 @@
 import numpy as np
-import cv2
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QAction
@@ -10,10 +10,10 @@ class ImageViewer(QtWidgets.QLabel):
         super(ImageViewer, self).__init__(*args, **kwargs)
         self.setText("default")
         try:
-            defaultImage = QtGui.QPixmap("assets/defaultImage.jpg")
-            self.setPixmap(defaultImage)
+            self.defaultImage = QtGui.QPixmap("assets/defaultImage.jpg")
         except:
-            pass
+            self.defaultImage = np.zeros((360, 360, 3))
+        self.setPixmap(self.defaultImage)
         
     def setPixmap(self, pixmap):
         super(ImageViewer, self).setPixmap(pixmap.scaled(

@@ -5,6 +5,7 @@ from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QMainWindow, QWidget, QApplication, QHBoxLayout, QVBoxLayout, QPushButton
 
 from components.CameraHandler import CameraHandler, CameraSettings
+from components.DrawerModule import Drawer
 from components.UI.ImageViewer import ImageViewer, ImageViewerWindow
 from components.UI.RangeSlider import RangeSlider
 from components.UI.RangeSliderLabel import RangeSliderLabel
@@ -21,6 +22,7 @@ class CustomizerWindow(QMainWindow):
         super().__init__(parent)
         self.camera = CameraHandler()
         self.camera.loadSettings("cache")
+        self.drawer = Drawer(self.camera)
         
         self._fps = 30
         self.mainTimer = QTimer()
@@ -33,7 +35,7 @@ class CustomizerWindow(QMainWindow):
 
     @QtCore.pyqtSlot()
     def imageUpdate(self):
-        image = self.camera.getProcessedImage(self._imageViewerSize)
+        image = self.drawer.drawer(self._imageViewerSize)
         image = QtGui.QImage(image.data, image.shape[1], image.shape[0], QtGui.QImage.Format_RGB888).rgbSwapped()
         self._currentImageViewer.setPixmap(QtGui.QPixmap.fromImage(image))
     
@@ -45,17 +47,18 @@ class CustomizerWindow(QMainWindow):
         self._currentImageViewer = self._imageViewer
         self._mainWidgetHorLayout.addWidget(self._imageViewer, stretch=3)
 
-        self._settingsBar = SettingsBar(self._mainWidget, self, self.camera)
+        self._settingsBar = SettingsBar(self._mainWidget, self, self.camera, self.drawer)
         self._mainWidgetHorLayout.addWidget(self._settingsBar, stretch=1)
 
         self.setCentralWidget(self._mainWidget)
 
 class SettingsBar(QWidget):
     
-    def __init__(self, parent, mainWindow : CustomizerWindow, camera : CameraHandler):
+    def __init__(self, parent, mainWindow : CustomizerWindow, camera : CameraHandler, drawer : Drawer):
         super().__init__(parent)
         self._mainWindow : CustomizerWindow = mainWindow
         self._camera = camera
+        self._drawer = drawer
         self.cameraSettings : CameraSettings = camera.settings
         self.setupUi()
     
@@ -104,6 +107,25 @@ class SettingsBar(QWidget):
         layout.addWidget(saveSettingsBtn)
         layout.addWidget(exportSettingsBtn)
         layout.addWidget(importSettingsBtn)
+    
+    def _createDrawerBtns(self, parent):
+        layout = QtWidgets.QHBoxLayout(parent)
+
+        switchModeBtn = QtWidgets.QPushButton(text="no draw")
+        cleanCanvasBtn = QtWidgets.QPushButton(text="Clean canvas")
+
+        def switchModeBtnClicked(btn):
+            if self._drawer.switchMode():
+                switchModeBtn.setText("draw")
+            else:
+                switchModeBtn.setText("no draw")
+        
+        switchModeBtn.clicked.connect(switchModeBtnClicked)
+        cleanCanvasBtn.clicked.connect(self._drawer.cleanCanvas)
+
+        layout.addWidget(switchModeBtn)
+        layout.addWidget(cleanCanvasBtn)
+        
 
     def setupUi(self):
         self._mainLayout = QVBoxLayout(self)
@@ -111,6 +133,9 @@ class SettingsBar(QWidget):
         self._unPinImageFrameButton = QPushButton("Unpin image viewer")
         self._isImageViewerPinned = True
         self._unPinImageFrameButton.clicked.connect(self._unPinButton)
+
+        self._drawerButtonsWid = QWidget()
+        self._createDrawerBtns(self._drawerButtonsWid)
 
         self._rangeSlidersWid = QWidget()
         self._createRangeSliders(self._rangeSlidersWid)
@@ -120,6 +145,7 @@ class SettingsBar(QWidget):
         self._createImportExportBtns(self._eximBtns)
 
         self._mainLayout.addWidget(self._unPinImageFrameButton, Qt.AlignmentFlag.AlignTop)
+        self._mainLayout.addWidget(self._drawerButtonsWid, Qt.AlignmentFlag.AlignTop)
         self._mainLayout.addWidget(self._rangeSlidersWid, Qt.AlignmentFlag.AlignCenter)
 
         self._mainLayout.addWidget(self._eximBtns, Qt.AlignmentFlag.AlignBottom)
