@@ -26,17 +26,18 @@ class CameraSettingsWidget(QWidget):
             return
         layout = QGridLayout()
 
-        minRangeLabel = RangeSliderLabel("MinRange", self.cameraSettings, field='minRange')
+        minRangeLabel = RangeSliderLabel("MinRange", self.cameraSettings, 'minRange')
         layout.addWidget(minRangeLabel, 0, 0)
-        layout.addWidget(RangeSlider().setup(max=255, updateValFunc=self.updateCameraSettings, container=self.cameraSettings.minRange, field=colors[0], label=minRangeLabel), 1, 0)
-        layout.addWidget(RangeSlider().setup(max=255, updateValFunc=self.updateCameraSettings, container=self.cameraSettings.minRange, field=colors[1], label=minRangeLabel), 2, 0)
-        layout.addWidget(RangeSlider().setup(max=255, updateValFunc=self.updateCameraSettings, container=self.cameraSettings.minRange, field=colors[2], label=minRangeLabel), 3, 0)
+        layout.addWidget(RangeSlider().setup(0, 255, self.updateCameraSettings, self.cameraSettings.minRange, colors[0], minRangeLabel), 1, 0)
+        layout.addWidget(RangeSlider().setup(0, 255, self.updateCameraSettings, self.cameraSettings.minRange, colors[1], minRangeLabel), 2, 0)
+        layout.addWidget(RangeSlider().setup(0, 255, self.updateCameraSettings, self.cameraSettings.minRange, colors[2], minRangeLabel), 3, 0)
 
-        maxRangeLabel = RangeSliderLabel("MaxRange", self.cameraSettings, field='maxRange')
+        maxRangeLabel = RangeSliderLabel("MaxRange", self.cameraSettings, 'maxRange')
         layout.addWidget(maxRangeLabel, 0, 1)
-        layout.addWidget(RangeSlider().setup(max=255, updateValFunc=self.updateCameraSettings, container=self.cameraSettings.maxRange, field=colors[0], label=maxRangeLabel), 1, 1)
-        layout.addWidget(RangeSlider().setup(max=255, updateValFunc=self.updateCameraSettings, container=self.cameraSettings.maxRange, field=colors[1], label=maxRangeLabel), 2, 1)
-        layout.addWidget(RangeSlider().setup(max=255, updateValFunc=self.updateCameraSettings, container=self.cameraSettings.maxRange, field=colors[2], label=maxRangeLabel), 3, 1)
+        layout.addWidget(RangeSlider().setup(0, 255, self.updateCameraSettings, self.cameraSettings.maxRange, colors[0], maxRangeLabel), 1, 1)
+        layout.addWidget(RangeSlider().setup(0, 255, self.updateCameraSettings, self.cameraSettings.maxRange, colors[1], maxRangeLabel), 2, 1)
+        layout.addWidget(RangeSlider().setup(0, 255, self.updateCameraSettings, self.cameraSettings.maxRange, colors[2], maxRangeLabel), 3, 1)
+
         return layout
 
     def setupUI(self):
