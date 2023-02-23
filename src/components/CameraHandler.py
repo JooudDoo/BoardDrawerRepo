@@ -59,9 +59,12 @@ class CameraSettings():
 
 class CameraHandler():
 
-    def __init__(self, videoStreamSource = 0, settings : CameraSettings = None):
+    def __init__(self, videoStreamSource = 0, settings : CameraSettings | str = None):
         self._videoStream = cv2.VideoCapture(videoStreamSource)
-        self.setupSettings(settings)
+        if type(settings) == str:
+            self.loadSettings(settings)
+        else:
+            self.setupSettings(settings)
     
     def setupSettings(self, settings : CameraSettings):
         if settings == None:
