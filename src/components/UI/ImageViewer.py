@@ -6,7 +6,6 @@ import cv2
 import numpy as np
 import time
 
-from qasync import QEventLoop, asyncSlot
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt, QTimer, QThread
 from PyQt6.QtGui import QAction
