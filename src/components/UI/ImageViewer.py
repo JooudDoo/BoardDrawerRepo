@@ -91,6 +91,8 @@ class ImView(QWidget):
                 self.imageLoaded = False
         else:
             self.setPixmap(self.toPixmap(self.imageQueue.get()))
+        if self.imageQueue.qsize() >= self.fps:
+            self.imageQueue = Queue()
 
     def addImageToQueue(self, image):
         if image is None: return
