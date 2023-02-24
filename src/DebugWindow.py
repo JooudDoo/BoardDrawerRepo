@@ -1,7 +1,7 @@
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QPushButton
+from PyQt6 import QtCore
+from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QPushButton
 
 from components.CameraHandler import CameraHandler, CameraSettings
 from components.DrawerModule import Drawer

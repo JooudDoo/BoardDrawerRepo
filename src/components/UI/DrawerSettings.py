@@ -1,5 +1,5 @@
 
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton
 
 from components.DrawerModule import Drawer
 

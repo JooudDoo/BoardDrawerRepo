@@ -1,6 +1,6 @@
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGridLayout, QHBoxLayout
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QGridLayout, QHBoxLayout
 
 from components.CameraHandler import CameraHandler
 from components.UI.RangeSlider import RangeSliderLabel, RangeSlider
@@ -48,7 +48,7 @@ class CameraSettingsWidget(QWidget):
 
         reduceSliderLayout = QVBoxLayout()
         reduceSliderLabel = RangeSliderLabel("ReduceBy", self.cameraSettings, field='maskReduceBy')
-        reduceSlider = RangeSlider(Qt.Vertical).setup(min=1, max=10, updateValFunc=self.updateCameraSettings, container=self.cameraSettings, field='maskReduceBy', label=reduceSliderLabel)
+        reduceSlider = RangeSlider(Qt.Orientation.Vertical).setup(min=1, max=10, updateValFunc=self.updateCameraSettings, container=self.cameraSettings, field='maskReduceBy', label=reduceSliderLabel)
         reduceSliderLayout.addWidget(reduceSliderLabel)
         reduceSliderLayout.addWidget(reduceSlider, alignment=Qt.AlignmentFlag.AlignHCenter)
 

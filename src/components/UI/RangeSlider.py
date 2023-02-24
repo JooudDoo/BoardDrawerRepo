@@ -1,11 +1,10 @@
 
-from PyQt5 import QtCore
-from PyQt5.QtWidgets import QSlider, QLabel
-from PyQt5.QtCore import Qt
+from PyQt6.QtWidgets import QSlider, QLabel
+from PyQt6.QtCore import Qt
 
 class RangeSlider(QSlider):
 
-    def __init__(self, orientation = Qt.Horizontal, parent = None):
+    def __init__(self, orientation = Qt.Orientation.Horizontal, parent = None):
         super().__init__(orientation,parent)
     
     def setup(self, min : int = 0, max : int = 0, updateValFunc = None, container = None, field : str = "", label : QLabel = None):

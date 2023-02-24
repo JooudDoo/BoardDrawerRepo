@@ -3,9 +3,10 @@ from cv2 import Mat
 import numpy as np
 import time
 
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QAction, QLabel, QSizePolicy, QVBoxLayout, QPushButton
+from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QAction
+from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QLabel, QSizePolicy, QVBoxLayout, QPushButton
 
 class FPSMeter(QLabel):
     def __init__(self,  *args, **kwargs):
@@ -47,7 +48,7 @@ class ImView(QWidget):
         self.mainLayout = QVBoxLayout(self)
 
         self.imageLabel = QLabel()
-        sizePolicy = QSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored)
         self.imageLabel.setMinimumSize(360, 360)
         self.imageLabel.setSizePolicy(sizePolicy)
         self.imageLabel.setScaledContents(False)
@@ -66,14 +67,14 @@ class ImView(QWidget):
             self.setImage(np.zeros((360, 360, 3)))
 
     def setImage(self, image : Mat):
-        image = QtGui.QImage(image.data, image.shape[1], image.shape[0], QtGui.QImage.Format_RGB888).rgbSwapped()
+        image = QtGui.QImage(image.data, image.shape[1], image.shape[0], QtGui.QImage.Format.Format_RGB888).rgbSwapped()
         self.setPixmap(QtGui.QPixmap.fromImage(image))
 
     def setPixmap(self, pixmap):
         self.FPSMeter.FPSCalculation()
         self.imageLabel.setPixmap(pixmap.scaled(
             self.imageLabel.width(), self.imageLabel.height(),
-            QtCore.Qt.KeepAspectRatio))
+            Qt.AspectRatioMode.KeepAspectRatio))
     
     def resizeEvent(self, a0: QtGui.QResizeEvent) -> None:
         super().resizeEvent(a0)
