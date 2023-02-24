@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 import cv2
 import numpy as np
+from imutils.video import VideoStream
 
 from components.ColorContainers import ColorContainer, RGB, HSL
 
@@ -60,7 +61,7 @@ class CameraSettings():
 class CameraHandler():
 
     def __init__(self, videoStreamSource = 0, settings : CameraSettings | str = None):
-        self._videoStream = cv2.VideoCapture(videoStreamSource)
+        self._videoStream = VideoStream(src=videoStreamSource).start()
         if type(settings) == str:
             self.loadSettings(settings)
         else:
@@ -87,9 +88,9 @@ class CameraHandler():
         self.setupSettings(CameraSettings.importFrom(fileName))
 
     def getFrame(self, size : tuple[int, int] = (0, 0)):
-        checkCode, frame = self._videoStream.read()
-        if not checkCode:
-            raise Exception("Frame not received")
+        frame = self._videoStream.read()
+        #if not checkCode:
+        #    raise Exception("Frame not received")
         if size != (0, 0):
             frame = cv2.resize(frame, size)
         return frame
@@ -131,4 +132,4 @@ class CameraHandler():
         return cv2.addWeighted(img, alpha, mask, beta, gamma)
 
     def __del__(self):
-        self._videoStream.release()
+        self._videoStream.stop()

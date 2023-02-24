@@ -39,7 +39,7 @@ class DebugWindow(QMainWindow):
         self.settingsBar = SettingsBar(self, self.camera, self.drawer)
         self.mainLayout.addWidget(self.settingsBar)
 
-    def createTimers(self, fps : int = 200):
+    def createTimers(self, fps : int = 35):
         self.fps = fps
         self.imageTimer = QTimer()
         self.imageTimer.timeout.connect(self.imViewsUpdate)
@@ -83,7 +83,7 @@ class SettingsBar(QWidget):
     def setupUI(self):
         self.mainLayout = QVBoxLayout(self)
 
-        self.separeteImView = ImViewWindow()
+        self.separeteImView = ImViewWindow(fps=self.mainWindow.fps)
         self.mainWindow.imViews.append(self.separeteImView.imView)
         self.separeteImViewBtn = self.separeteImView.createSwitchBtn()
     

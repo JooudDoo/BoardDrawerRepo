@@ -144,8 +144,9 @@ class ImView(QWidget):
 
 class ImViewWindow(QMainWindow):
 
-    def __init__(self):
+    def __init__(self, fps : int = 30):
         super(ImViewWindow, self).__init__()
+        self.fps = fps
         self.setupUi()
         self.isShow = False
         self.switchBtn = None
@@ -176,7 +177,7 @@ class ImViewWindow(QMainWindow):
     def setupUi(self):
         self._imView = QWidget()
         imViewLayout = QHBoxLayout(self._imView)
-        self.imView = ImView()
+        self.imView = ImView(fps=self.fps)
         self.imView.addFilter(Filters.drawCanvas)
         imViewLayout.addWidget(self.imView)
         self.setCentralWidget(self._imView)
