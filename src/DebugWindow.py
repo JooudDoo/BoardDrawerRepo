@@ -4,10 +4,11 @@ from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QPushButton
 
 from components.CameraHandler import CameraHandler, CameraSettings
-from components.DrawerModule import Drawer
+from components.DrawerModule import Drawer, Filters, createImageFromLayers
 from components.UI.ImageViewer import ImView, ImViewSecurityWidget, ImViewWindow
 from components.UI.DrawerSettings import DrawerSettingsWidget
 from components.UI.CameraSettings import CameraSettingsWidget
+from components.UI.ImageViewerControlPanel import imViewControlPanel
 
 def runWindow():
     window = DebugWindow()
@@ -32,13 +33,13 @@ class DebugWindow(QMainWindow):
         self.mainLayout = QHBoxLayout(self.mainWidget)
         self.setCentralWidget(self.mainWidget)
 
-        self.imViewsContainer = ImViewSecurityWidget(self.imViews)
+        self.imViewsContainer = ImViewSecurityWidget(self.fps, self.imViews)
         self.mainLayout.addWidget(self.imViewsContainer, stretch=3)
 
         self.settingsBar = SettingsBar(self, self.camera, self.drawer)
         self.mainLayout.addWidget(self.settingsBar)
 
-    def createTimers(self, fps : int = 30):
+    def createTimers(self, fps : int = 200):
         self.fps = fps
         self.imageTimer = QTimer()
         self.imageTimer.timeout.connect(self.imViewsUpdate)
@@ -46,11 +47,10 @@ class DebugWindow(QMainWindow):
 
     @QtCore.pyqtSlot()
     def imViewsUpdate(self):
-        image = self.drawer.drawer()
+        layers = self.drawer.drawer()
         for imView in self.imViews:
             if imView.isWorking:
-                imView.setImage(image)
-
+                imView.addImageToQueue(createImageFromLayers(layers, imView.filters))
 
 class SettingsBar(QWidget):
 
@@ -91,7 +91,7 @@ class SettingsBar(QWidget):
 
         self.cameraSettingsWid = CameraSettingsWidget(self.camera)
 
-        self.imViewsControlPanel = None
+        self.imViewsControlPanel = imViewControlPanel(self.mainWindow.imViewsContainer)
 
         self.settingsImExBtns = self.createImportExportBtns()
 

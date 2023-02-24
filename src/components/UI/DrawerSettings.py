@@ -16,7 +16,6 @@ class DrawerSettingsWidget(QWidget):
 
         switchDrawModeBtn = QPushButton(text="Draw")
         cleanCanvasBtn = QPushButton(text="Clean canvas")
-        showMaskBtn = QPushButton(text="Show mask")
 
         def switchDrawModeBtnClicked():
             if self.drawer.switchDrawMode():
@@ -24,18 +23,12 @@ class DrawerSettingsWidget(QWidget):
             else:
                 switchDrawModeBtn.setText("Draw")
 
-        def showMaskBtnClicked():
-            if self.drawer.swictchMaskShowMode():
-                showMaskBtn.setText("Hide mask")
-            else:
-                showMaskBtn.setText("Show mask")
+
         
         switchDrawModeBtn.clicked.connect(switchDrawModeBtnClicked)
-        showMaskBtn.clicked.connect(showMaskBtnClicked)
         cleanCanvasBtn.clicked.connect(self.drawer.cleanCanvas)
 
         layout.addWidget(switchDrawModeBtn)
-        layout.addWidget(showMaskBtn)
         layout.addWidget(cleanCanvasBtn)
         return layout
 

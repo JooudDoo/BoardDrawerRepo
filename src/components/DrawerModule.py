@@ -1,16 +1,36 @@
 
+from enum import Enum
+
 import cv2
 import numpy as np
 
-from components.ColorContainers import ColorContainer, RGB, HSL
+from components.ColorContainers import RGB
 from components.CameraHandler import CameraHandler
+
+class Filters(Enum):
+    image = "image"
+    laserMask = "laserMask"
+    drawCanvas = "drawCanvas"
+
+def createImageFromLayers(layers : dict[Filters, cv2.Mat], filters : list[Filters]) -> cv2.Mat:
+    resultImage = None
+    for filter in filters:
+        resultImage = applyFilter(resultImage, layers[filter])
+    return resultImage
+    
+def applyFilter(img, layer):
+    if img is None:
+        return layer
+    else:
+        return Drawer.applyMask(img, layer)
 
 class Drawer():
 
     def __init__(self, camera : CameraHandler, defaultColor : RGB = RGB(0, 255, 255)):
         self.camera = camera
-        self._draw : bool = False
-        self._showMask : bool = False
+        self._draw : bool = False #REDO
+
+        self.filters = [x for x in Filters]
 
         self.defaultColor = defaultColor
         self._save_x = 0
@@ -28,15 +48,18 @@ class Drawer():
         self._save_y = 0
         return self._draw
 
-    def drawer(self, size : tuple [int, int] = (0,0)):
-        frame = self.camera.getFrame(size)
-        mask = self.camera.getColorRangeMask(frame)
-        resultMask = self._drawCanvas
-        if self._draw:
-            resultMask = self.getMoments(frame, mask)
-        if self._showMask:
-            resultMask = cv2.add(resultMask, cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR))
-        return self.applyMask(frame, resultMask)
+    def drawer(self, size : tuple [int, int] = (0,0)) -> dict[Filters, cv2.Mat]:
+        """
+        return all filter layers matched in self.filters
+        """
+        image = self.camera.getFrame(size)
+        laserMask = self.camera.getColorRangeMask(image)
+        drawCanvas = self.getMoments(laserMask)
+        laserMask = cv2.cvtColor(laserMask, cv2.COLOR_GRAY2BGR)
+        imageLayers = dict()
+        for filter in self.filters:
+            imageLayers.update({filter: locals()[filter.value]})
+        return imageLayers
 
     # переписать возможна смена размеров входного изображения
     @staticmethod
@@ -47,12 +70,17 @@ class Drawer():
     def cleanCanvas(self):
         self._drawCanvas = np.zeros_like(self._drawCanvas)
 
-    def applyMask(self, img, mask, alpha : float = 0.6, gamma : float = 0.1):
+    @staticmethod
+    def applyMask(img, mask, weighted : bool = False, alpha : float = 0.6, gamma : float = 0.1):
+        if not weighted:
+            return cv2.add(img, mask)
         beta = 1 - alpha
         return cv2.addWeighted(img, alpha, mask, beta, gamma)
 
     # Переписать и разделить на под функции
-    def getMoments(self, img, mask):
+    def getMoments(self, mask):
+        if not self._draw:
+            return self._drawCanvas
         moments = cv2.moments(mask, 1)
         dM01 = moments['m01']
         dM10 = moments['m10']
@@ -71,4 +99,3 @@ class Drawer():
         self._save_y = y
 
         return self._drawCanvas
-        # cv2.add(img, self._drawCanvas)
