@@ -1,4 +1,6 @@
 
+from threading import Thread
+
 from PyQt6 import QtCore
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QPushButton
@@ -50,7 +52,9 @@ class DebugWindow(QMainWindow):
         layers = self.drawer.drawer()
         for imView in self.imViews:
             if imView.isWorking:
-                imView.addImageToQueue(createImageFromLayers(layers, imView.filters))
+                th = Thread(target=lambda layers, imView: imView.addImageToQueue(createImageFromLayers(layers, imView.filters)), args=(layers, imView))
+                th.start()
+                #imView.addImageToQueue(createImageFromLayers(layers, imView.filters))
 
 class SettingsBar(QWidget):
 
