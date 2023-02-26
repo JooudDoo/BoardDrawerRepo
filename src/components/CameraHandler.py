@@ -27,6 +27,10 @@ class CameraSettings():
     maxRange : ColorContainer
     maskReduceBy : int 
 
+    def insert(self, newSettings):
+        for key in vars(self).keys():
+            setattr(self, key, getattr(newSettings, key))
+
     @staticmethod
     def importFrom(fileName : str):
         with open(fileName, 'r', encoding='utf8') as importFile:

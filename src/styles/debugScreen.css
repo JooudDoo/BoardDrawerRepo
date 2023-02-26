@@ -1,0 +1,10 @@
+
+SettingsBar {
+    padding-top: 25%;
+    padding-bottom: 0%;
+}
+
+SettingsModule {
+    border: 1px solid black;
+    border-radius: 10%;
+}

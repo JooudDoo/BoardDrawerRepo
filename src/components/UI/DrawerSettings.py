@@ -1,9 +1,10 @@
 
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton
+from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QPushButton
 
 from components.DrawerModule import Drawer
+from components.UI.StyleModules import SettingsModule
 
-class DrawerSettingsWidget(QWidget):
+class DrawerSettingsWidget(SettingsModule):
     
     def __init__(self, drawer : Drawer, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -22,8 +23,6 @@ class DrawerSettingsWidget(QWidget):
                 switchDrawModeBtn.setText("No draw")
             else:
                 switchDrawModeBtn.setText("Draw")
-
-
         
         switchDrawModeBtn.clicked.connect(switchDrawModeBtnClicked)
         cleanCanvasBtn.clicked.connect(self.drawer.cleanCanvas)

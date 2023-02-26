@@ -7,9 +7,9 @@ import numpy as np
 import time
 
 from PyQt6 import QtCore, QtGui, QtWidgets
-from PyQt6.QtCore import Qt, QTimer, QThread
+from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QAction
-from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QLabel, QSizePolicy, QVBoxLayout, QPushButton
+from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLabel, QSizePolicy, QVBoxLayout, QPushButton
 
 from components.DrawerModule import Filters
 
@@ -144,10 +144,10 @@ class ImView(QWidget):
             self.hide()
         return self.isWorking
 
-class ImViewWindow(QMainWindow):
+class ImViewWindow(QWidget):
 
     def __init__(self, fps : int = 30):
-        super(ImViewWindow, self).__init__()
+        super().__init__()
         self.fps = fps
         self.setupUi()
         self.isShow = False
@@ -170,19 +170,17 @@ class ImViewWindow(QMainWindow):
     def createSwitchBtn(self):
         if self.switchBtn:
             return self.switchBtn
-        self.switchBtn = QPushButton()
-        self.switchBtn.setText("Show window")
+        self.switchBtn = QPushButton("Show window", objectName="switchBtn")
         self.switchBtn.clicked.connect(self.switchBtnFunc)
 
         return self.switchBtn
 
     def setupUi(self):
-        self._imView = QWidget()
+        self._imView = self
         imViewLayout = QHBoxLayout(self._imView)
         self.imView = ImView(fps=self.fps)
         self.imView.addFilter(Filters.drawCanvas)
         imViewLayout.addWidget(self.imView)
-        self.setCentralWidget(self._imView)
     
     def closeEvent(self, event):
         self.switchBtnFunc()

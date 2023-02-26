@@ -20,6 +20,9 @@ class RangeSlider(QSlider):
         self.valueChanged.connect(self.changeFunction)
         return self
 
+    def updateSettings(self):
+        self.setValue(getattr(self._connectedValue, self._containerName))
+
     def changeFunction(self, val):
         self._updatefunction(val)
         self._updateValFunction()
@@ -35,6 +38,9 @@ class RangeSliderLabel(QLabel):
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setFixedHeight(25)
         self.setMinimumWidth(123)
+    
+    def updateSettings(self):
+        self.updateValue()
 
     def updateValue(self):
         self.setText(f"{self._text}\n{str(getattr(self.cont, self.fieldName))}")

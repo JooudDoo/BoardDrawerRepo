@@ -1,14 +1,15 @@
 
 import re
 
-from PyQt6 import QtCore, QtGui
+from PyQt6 import QtCore
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QCheckBox, QGridLayout, QScrollArea
 
 from components.UI.ImageViewer import ImViewSecurityWidget, ImView
 from components.DrawerModule import Filters
+from components.UI.StyleModules import SettingsModule
 
-class imViewControlPanel(QWidget):
+class imViewControlPanel(SettingsModule):
     
     def __init__(self, imViewContainer, *args, **kwargs):
         super().__init__(*args, **kwargs)

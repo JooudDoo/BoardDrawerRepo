@@ -4,7 +4,6 @@ class ColorContainer():
     def __init__():
         pass
 
-
 class RGB(ColorContainer):
     """
     Класс содержащий значения RGB

@@ -1,15 +1,17 @@
 
+from contextlib import suppress
 from threading import Thread
 
 from PyQt6 import QtCore
 from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QPushButton
+from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QFrame
 
 from components.CameraHandler import CameraHandler, CameraSettings
 from components.DrawerModule import Drawer, Filters, createImageFromLayers
 from components.UI.ImageViewer import ImView, ImViewSecurityWidget, ImViewWindow
 from components.UI.DrawerSettings import DrawerSettingsWidget
 from components.UI.CameraSettings import CameraSettingsWidget
+from components.UI.ExportImportSettings import ExportImportFrame
 from components.UI.ImageViewerControlPanel import imViewControlPanel
 
 def runWindow():
@@ -27,8 +29,13 @@ class DebugWindow(QMainWindow):
         self.createTimers()
 
         self.setupUI()
+        self.setupStyles()
 
         self.imageTimer.start()
+    
+    def setupStyles(self):
+        with open("src/styles/debugScreen.css", 'r') as style:
+            self.setStyleSheet(style.read())
 
     def setupUI(self):
         self.mainWidget = QWidget()
@@ -54,9 +61,8 @@ class DebugWindow(QMainWindow):
             if imView.isWorking:
                 th = Thread(target=lambda layers, imView: imView.addImageToQueue(createImageFromLayers(layers, imView.filters)), args=(layers, imView))
                 th.start()
-                #imView.addImageToQueue(createImageFromLayers(layers, imView.filters))
 
-class SettingsBar(QWidget):
+class SettingsBar(QFrame):
 
     def __init__(self, parent : DebugWindow, camera : CameraHandler, drawer : Drawer, *args, **kwargs):
         super().__init__(parent=parent,*args, **kwargs)
@@ -67,25 +73,16 @@ class SettingsBar(QWidget):
         self.cameraSettings : CameraSettings = camera.settings
         self.setupUI()
     
-    def createImportExportBtns(self):
-        wid = QWidget()
-        layout = QHBoxLayout(wid)
-
-        saveSettingsBtn = QPushButton(text='Save')
-        exportSettingsBtn = QPushButton(text='Export')
-        importSettingsBtn = QPushButton(text='Import')
-
-        saveSettingsFunc = lambda: CameraSettings.exportTo(self.cameraSettings, 'cache')
-        saveSettingsBtn.clicked.connect(saveSettingsFunc)
-
-        layout.addWidget(saveSettingsBtn)
-        layout.addWidget(exportSettingsBtn)
-        layout.addWidget(importSettingsBtn)
-
-        return wid
-
+    def updateModules(self, newSettings : CameraSettings):
+        #TODO this feature
+        self.cameraSettings.insert(newSettings)
+        self.drawerSettingsWid.updateSettings(newSettings)
+        self.cameraSettingsWid.updateSettings(newSettings)
+        self.imViewsControlPanel.updateSettings(newSettings)
+    
     def setupUI(self):
         self.mainLayout = QVBoxLayout(self)
+        self.mainLayout.setSpacing(25)
 
         self.separeteImView = ImViewWindow(fps=self.mainWindow.fps)
         self.mainWindow.imViews.append(self.separeteImView.imView)
@@ -97,7 +94,7 @@ class SettingsBar(QWidget):
 
         self.imViewsControlPanel = imViewControlPanel(self.mainWindow.imViewsContainer)
 
-        self.settingsImExBtns = self.createImportExportBtns()
+        self.settingsImExBtns = ExportImportFrame(self.cameraSettings, self.updateModules)
 
         self.mainLayout.addWidget(self.separeteImViewBtn, Qt.AlignmentFlag.AlignCenter)
         self.mainLayout.addWidget(self.drawerSettingsWid, Qt.AlignmentFlag.AlignCenter)
