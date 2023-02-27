@@ -1,10 +1,111 @@
+TitleBar {
+    background-color: rgb(54, 157, 180);
+}
+
+DebugWindow#debugScreen {
+    background-color: rgb(11, 15, 25);
+}
+
+RangeSliderLabel#settingTitle {
+    color: white;
+}
+
+RangeSlider::handle:horizontal {
+    height: 18px;
+    border-radius: 9px;
+    width: 18px;
+    background: #0075ff;
+}
+
+RangeSlider::add-page:horizontal {
+    background: lightgrey;
+    border-top-right-radius: 9px;
+    border-bottom-right-radius: 9px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+RangeSlider::sub-page:horizontal {
+    background: #0075ff;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    border-top-left-radius: 9px;
+    border-bottom-left-radius: 9px;
+}
+
+RangeSlider::handle:vertical {
+    height: 18px;
+    border-radius: 9px;
+    width: 18px;
+    background: #0075ff;
+}
+
+RangeSlider::add-page:vertical {
+    background: #0075ff;
+    border-bottom-right-radius: 9px;
+    border-bottom-left-radius: 9px;
+}
+
+RangeSlider::sub-page:vertical {
+    background: lightgrey;
+    border-top-right-radius: 9px;
+    border-top-left-radius: 9px;
+}
+
+ImViewSecurityWidget#mainImViewers {
+    border: 1px solid;
+    border-color: rgb(55, 65, 81);
+    border-radius: 10%;
+    background-color: rgb(17, 24, 39);
+}
+
+FPSMeter {
+    color: white
+}
+
+QFrame#imViewFilters {
+    background-color: rgb(31, 41, 55);
+}
+
+FilterCheckBox {
+    color: white;
+}
+
+FilterCheckBox::indicator:unchecked {
+    background-color: #111827;
+    border: 1px solid;
+    border-radius: 9px;
+}
+
+FilterCheckBox::indicator:checked {
+    background-color: white;
+    border: 5px solid;
+    border-radius: 9px;
+}
+
+QPushButton#debugSettingsBtn {
+    color: white;
+    border: 1px solid;
+    border-radius: 9px;
+    height: 60px;
+    background-color: qlineargradient(x1: 0, y1:0, x2:0, y2: 1, stop: 0 #4b5563, stop: 1 #374151);
+    /* it's normal */
+}
 
 SettingsBar {
     padding-top: 25%;
     padding-bottom: 0%;
+    border: 3px solid;
+    border-color: rgb(55, 65, 81);
+    background-color: rgb(17, 24, 39);
 }
 
 SettingsModule {
-    border: 1px solid black;
+    border: 1px solid rgba(128, 128, 128, 0.1);
     border-radius: 10%;
+    background-color: rgb(31, 41, 55);
+}
+
+QCheckBox#tunerMainCheckBox {
+    color: white;
 }
