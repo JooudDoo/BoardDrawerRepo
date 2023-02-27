@@ -10,11 +10,12 @@ RangeSliderLabel#settingTitle {
     color: white;
 }
 
-RangeSlider::handle:horizontal {
+RangeSlider::handle:horizontal, RangeSlider::handle:vertical {
     height: 18px;
+    border: 4px solid white;
     border-radius: 9px;
     width: 18px;
-    background: #0075ff;
+    background: #0255b3;
 }
 
 RangeSlider::add-page:horizontal {
@@ -31,13 +32,6 @@ RangeSlider::sub-page:horizontal {
     border-bottom-right-radius: 0px;
     border-top-left-radius: 9px;
     border-bottom-left-radius: 9px;
-}
-
-RangeSlider::handle:vertical {
-    height: 18px;
-    border-radius: 9px;
-    width: 18px;
-    background: #0075ff;
 }
 
 RangeSlider::add-page:vertical {
@@ -63,21 +57,17 @@ FPSMeter {
     color: white
 }
 
-QFrame#imViewFilters {
-    background-color: rgb(31, 41, 55);
-}
-
-FilterCheckBox {
+FilterCheckBox, QCheckBox#tunerMainCheckBox {
     color: white;
 }
 
-FilterCheckBox::indicator:unchecked {
+FilterCheckBox::indicator:unchecked, QCheckBox#tunerMainCheckBox::indicator:unchecked  {
     background-color: #111827;
     border: 1px solid;
     border-radius: 9px;
 }
 
-FilterCheckBox::indicator:checked {
+FilterCheckBox::indicator:checked, QCheckBox#tunerMainCheckBox::indicator:checked {
     background-color: white;
     border: 5px solid;
     border-radius: 9px;
@@ -106,6 +96,33 @@ SettingsModule {
     background-color: rgb(31, 41, 55);
 }
 
-QCheckBox#tunerMainCheckBox {
-    color: white;
+QFrame#imViewFilters {
+    background-color: rgb(31, 41, 55);
+}
+
+QScrollBar#imViewFilters:vertical {
+	border: none;
+    background: rgb(31, 41, 55);
+    width: 14px;
+    margin: 0 0 0 0;
+ }
+
+QScrollBar#imViewFilters::handle:vertical {	
+	min-height: 30px;
+	border-radius: 7px;
+    background-color: qlineargradient(x1: 0, y1:0, x2:0, y2: 1, stop: 0 #4b5563, stop: 1 #374151);
+    /* it's normal */
+}
+
+QScrollBar#imViewFilters::handle:vertical:hover, QScrollBar#imViewFilters::handle:vertical:pressed{	
+	background-color: #111827;
+}
+
+QScrollBar#imViewFilters::sub-line:vertical, QScrollBar#imViewFilters::add-line:vertical {
+	border: none;
+	height: 0px;
+}
+
+QScrollBar#imViewFilters::up-arrow:vertical, QScrollBar#imViewFilters::down-arrow:vertical, QScrollBar#imViewFilters::add-page:vertical, QScrollBar#imViewFilters::sub-page:vertical {
+	background: none;
 }

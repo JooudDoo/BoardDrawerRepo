@@ -137,6 +137,9 @@ class ImView(QWidget):
     def resizeEvent(self, a0: QtGui.QResizeEvent) -> None:
         super().resizeEvent(a0)
         self.FPSMeter.updatePosition()
+        self.imageLoaded = True
+        self.updateImageFromQueue()
+
 
     def setState(self, newState: bool):
         # Sets on/off if necessary returns new state

@@ -54,6 +54,7 @@ class imViewTuner(QWidget):
             layout.addWidget(checkBox)
 
         scrollArea = QScrollArea(objectName="imViewFilters")
+        scrollArea.verticalScrollBar().setObjectName("imViewFilters")
         scrollArea.setWidget(checkBoxWidget)
         return scrollArea
 
