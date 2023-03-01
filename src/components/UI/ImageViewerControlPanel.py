@@ -30,7 +30,7 @@ class imViewControlPanel(SettingsModule):
                 layout.addWidget(tuner, row, column)
 
 
-class imViewTuner(QWidget):
+class imViewTuner(QFrame):
 
     def __init__(self, imViewsContainer: ImViewSecurityWidget, imViewID: int,  *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -3,7 +3,7 @@ from threading import Thread
 
 from PyQt6 import QtCore
 from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QFrame
+from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QFrame
 
 from components.CameraHandler import CameraHandler, CameraSettings
 from components.DrawerModule import Drawer, createImageFromLayers
