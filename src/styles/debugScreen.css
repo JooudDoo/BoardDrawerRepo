@@ -82,6 +82,16 @@ QPushButton#debugSettingsBtn {
     /* it's normal */
 }
 
+QPushButton#debugSettingsBtn:hover {
+    background-color: qlineargradient(x1: 0, y1:0, x2:0, y2: 1, stop: 0 #4a5461, stop: 1 #313a47);
+    /* it's normal */
+}
+
+QPushButton#debugSettingsBtn:pressed {
+    background-color: qlineargradient(x1: 0, y1:0, x2:0, y2: 1, stop: 0 #2f3641, stop: 1 #262f3b);
+    /* it's normal */
+}
+
 SettingsBar {
     padding-top: 25%;
     padding-bottom: 0%;
