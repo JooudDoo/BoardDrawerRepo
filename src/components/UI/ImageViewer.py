@@ -56,7 +56,7 @@ class FPSMeter(QLabel):
         self.updatePosition()
 
 
-class ImView(QWidget):
+class ImView(QFrame):
 
     def __init__(self, fps: int = 30, name: str = "", metadata: str = None,  *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -216,7 +216,7 @@ class ImViewSecurityWidget(QFrame):
         for row in range(self.rows):
             for column in range(self.columns):
                 imView = ImView(fps=self.imViewFPS,
-                                metadata=f"POS<{row}:{column}>")
+                                metadata=f"POS<{row}:{column}>", objectName="security")
                 self.imViewContainer.append(imView)
                 self.mainLayout.addWidget(imView, row, column)
 

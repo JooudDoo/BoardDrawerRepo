@@ -53,6 +53,11 @@ ImViewSecurityWidget#mainImViewers {
     background-color: rgb(17, 24, 39);
 }
 
+ImView#security {
+    border: 1px solid rgb(55, 65, 81);
+    border-radius: 15%;
+}
+
 FPSMeter {
     color: white
 }
