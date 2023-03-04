@@ -105,12 +105,6 @@ class CameraHandler():
             frame = cv2.resize(frame, size)
         return frame
 
-    def getMaskedFrame(self, size: tuple[int, int] = (0, 0)):
-        frame = self.getFrame(size)
-        mask = self.getColorRangeMask(frame)
-        maskedFrame = self.applyMaskOnImage(frame, mask)
-        return maskedFrame
-
     def getColorRangeMask(self, image: cv2.Mat) -> cv2.Mat:
         """
         Функция возвращающая маску заданного цветового диапазона. Значение маски берется из настроек

@@ -6,7 +6,7 @@ from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QFrame
 
 from components.CameraHandler import CameraHandler, CameraSettings
-from components.DrawerModule import DebugImageProcessor, createImageFromLayers
+from components.ImageProcessor import DebugImageProcessor, createImageFromLayers
 from components.UI.ImageViewer import ImView, ImViewSecurityWidget, ImViewWindow
 from components.UI.DrawerSettings import DrawerSettingsWidget
 from components.UI.CameraSettings import CameraSettingsWidget
@@ -21,13 +21,13 @@ def runWindow():
 
 class DebugWindow(QFrame):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, fps : int = 32, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.camera = CameraHandler(settings='cache')
         self.drawer = DebugImageProcessor(camera=self.camera)
         self.imViews: list[ImView] = []
-        self.createTimers()
+        self.createTimers(fps=fps)
 
         self.setObjectName("debugScreen")
         self.setupUI()
@@ -49,20 +49,19 @@ class DebugWindow(QFrame):
         self.settingsBar = SettingsBar(self, self.camera, self.drawer)
         self.mainLayout.addWidget(self.settingsBar)
 
-    def createTimers(self, fps: int = 32):
+    def createTimers(self, fps: int):
         self.fps = fps
         self.imageTimer = QTimer()
         self.imageTimer.timeout.connect(self.imViewsUpdate)
         self.imageTimer.setInterval(1000//self.fps)
-    
+
     @property
     def reqLayers(self):
         layers = set()
         for imView in self.imViews:
-            for layer in imView.Layer:
+            for layer in imView.layers:
                 layers.add(layer)
         return list(layers)
-
 
     @QtCore.pyqtSlot()
     def imViewsUpdate(self):
@@ -70,7 +69,7 @@ class DebugWindow(QFrame):
         for imView in self.imViews:
             if imView.isWorking:
                 th = Thread(target=lambda layers, imView: imView.addImageToQueue(
-                    createImageFromLayers(layers, imView.Layer)), args=(layers, imView))
+                    createImageFromLayers(layers, imView.layers)), args=(layers, imView))
                 th.start()
 
 

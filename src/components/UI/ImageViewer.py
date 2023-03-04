@@ -1,5 +1,4 @@
 
-from threading import Thread
 from queue import Queue
 
 import cv2
@@ -11,7 +10,7 @@ from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLabel, QSizePolicy, QVBoxLayout, QPushButton, QFrame
 
-from components.DrawerModule import Layer
+from components.ImageProcessor import Layer
 
 
 class FPSMeter(QLabel):
@@ -58,44 +57,48 @@ class FPSMeter(QLabel):
 
 class ImView(QFrame):
 
-    def __init__(self, fps: int = 30, name: str = "", metadata: str = None, isWorking=True,  *args, **kwargs):
+    def __init__(self, fps: int = 30, metadata: str = None, isWorking=True,  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fps = fps
+        self.metadata = metadata
         self.isWorking = isWorking
 
         self.mainLayout = QVBoxLayout(self)
-        self.imageLabel = QLabel()
-        sizePolicy = QSizePolicy(
-            QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored)
-        self.imageLabel.setMinimumSize(360, 360)
-        self.imageLabel.setSizePolicy(sizePolicy)
-        self.imageLabel.setScaledContents(False)
 
+        self.imageLabel = QLabel()
+        self.initImageLabel()
         self.mainLayout.addWidget(self.imageLabel)
 
         self.FPSMeter = FPSMeter(parent=self)
 
+        self.initTimer()
+        
+        self.defaultImage = None
+
+        self.layers = []
+
+        self.updateTimer.start()
+
+    def initTimer(self):
         self.updateTimer = QTimer()
         self.updateTimer.setInterval(1000//self.fps)
         self.updateTimer.timeout.connect(self.updateImageFromQueue)
         self.imageQueue = Queue()
         self.notLoadedCount = 0
-        self.imageLoaded = True
 
-        self.defaultImage = None
-        self.getDefaultImage()
-
-        self.metadata = metadata
-        self.Layer = []
-
-        self.updateTimer.start()
+    def initImageLabel(self):
+        sizePolicy = QSizePolicy(
+            QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored)
+        self.imageLabel.setMinimumSize(128, 128)
+        self.imageLabel.setSizePolicy(sizePolicy)
+        self.imageLabel.setScaledContents(False)
 
     def updateImageFromQueue(self):
         if not self.isWorking:
             return
         if self.imageQueue.empty():
             if self.imageLoaded:
-                if self.notLoadedCount >= 50:
+                if self.notLoadedCount >= self.fps:
                     self.setPixmap(self.getDefaultImage())
                     self.imageLoaded = False
                     self.notLoadedCount = 0
@@ -133,12 +136,12 @@ class ImView(QFrame):
         self.FPSMeter.frameProcessed()
 
     def addFilter(self, filter: Layer):
-        if filter not in self.Layer:
-            self.Layer.append(filter)
+        if filter not in self.layers:
+            self.layers.append(filter)
 
     def removeFilter(self, filter: Layer):
-        if filter in self.Layer:
-            self.Layer.remove(filter)
+        if filter in self.layers:
+            self.layers.remove(filter)
 
     def resizeEvent(self, a0: QtGui.QResizeEvent) -> None:
         super().resizeEvent(a0)
