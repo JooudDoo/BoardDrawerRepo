@@ -11,7 +11,7 @@ from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLabel, QSizePolicy, QVBoxLayout, QPushButton, QFrame
 
-from components.DrawerModule import Layer
+from components.ImageProcessor import Layer
 
 
 class FPSMeter(QLabel):

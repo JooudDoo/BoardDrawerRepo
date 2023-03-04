@@ -6,7 +6,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QCheckBox, QGridLayout, QScrollArea, QFrame
 
 from components.UI.ImageViewer import ImViewSecurityWidget, ImView
-from components.DrawerModule import Layer
+from components.ImageProcessor import Layer
 from components.UI.StyleModules import SettingsModule
 
 

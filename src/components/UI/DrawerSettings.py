@@ -1,7 +1,7 @@
 
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QPushButton
 
-from components.DrawerModule import DebugImageProcessor
+from components.ImageProcessor import DebugImageProcessor
 from components.UI.StyleModules import SettingsModule
 
 

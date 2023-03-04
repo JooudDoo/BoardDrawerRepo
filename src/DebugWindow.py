@@ -6,7 +6,7 @@ from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QFrame
 
 from components.CameraHandler import CameraHandler, CameraSettings
-from components.DrawerModule import DebugImageProcessor, createImageFromLayers
+from components.ImageProcessor import DebugImageProcessor, createImageFromLayers
 from components.UI.ImageViewer import ImView, ImViewSecurityWidget, ImViewWindow
 from components.UI.DrawerSettings import DrawerSettingsWidget
 from components.UI.CameraSettings import CameraSettingsWidget

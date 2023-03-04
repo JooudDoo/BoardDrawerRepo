@@ -10,12 +10,29 @@ from components.CameraHandler import CameraHandler
 
 
 class Layer(Enum):
+    """
+    Enum содержащий имя слоев
+
+    Значением Enum'а должна быть строка содержащая имя переменной, которая будет передаватся в функции сборщики
+    """
+
     image = "image"
     laserMask = "laserMask"
     drawCanvas = "drawCanvas"
 
 
 class LayerInfo():
+    """
+    Класс содержащий основную информацию для генерации нового слоя
+
+    Параметры
+    ---------
+    `layer` - имя целевого слоя
+
+    `func` - функция для сборки слоя
+
+    `dependsOn` - список слоев необходимых для сборки целевого слоя
+    """
     def __init__(self, layer: Layer, func: Callable, dependsOn: list[Layer] = []):
         self.layer = layer
         self._func = func
@@ -30,37 +47,64 @@ class LayerInfo():
 
 
 class BasicImageProcessor():
+    """
+    Базовый класс обработчика изображений
+    -------
+    """
 
     def __init__(self, camera: CameraHandler):
         self.cameraHandler = camera
         self.layersInfo: dict[Layer, LayerInfo] = dict()
 
     def addLayerInfo(self, layerInfo: LayerInfo):
+        """
+        Добавление описания слоя для системы сборки зависимостей слоев
+
+        Параметры
+        ---------
+        `layerInfo` - класс с описанием генерации слоя
+        """
         self.layersInfo.update({layerInfo.layer: layerInfo})
 
-    def getLayerInfo(self, layer: Layer):
+    def _getLayerInfo(self, layer: Layer):
         return self.layersInfo.get(layer)
 
-    def createLayerDepends(self, layer: Layer, depsIn: dict[Layer, cv2.Mat] = dict()):
+    def _createLayerDepends(self, layer: Layer, depsIn: dict[Layer, cv2.Mat] = dict()):
+        """
+        Создание необходимых зависимостей для создания целевого слоя
+
+        Параметры
+        ---------
+        `layer` - ключевой слой
+
+        `depsIn` - словарь с сгенерированными зависимостями
+        """
         deps: dict[Layer, cv2.Mat] = depsIn
-        for depend in self.getLayerInfo(layer).dependsOn:
+        for depend in self._getLayerInfo(layer).dependsOn:
             if depend not in deps:
-                if self.getLayerInfo(depend).dependsOn == []:
-                    deps.update({depend: self.getLayerInfo(depend).func(deps)})
+                if self._getLayerInfo(depend).dependsOn == []:
+                    deps.update({depend: self._getLayerInfo(depend).func(deps)})
                 else:
-                    deps = self.createLayerDepends(depend, deps)
-                    deps.update({depend: self.getLayerInfo(depend).func(deps)})
+                    deps = self._createLayerDepends(depend, deps)
+                    deps.update({depend: self._getLayerInfo(depend).func(deps)})
         return deps
 
     def __call__(self, layers: list[Layer]):
-        return self.getLayers(layers)
+        return self._getLayers(layers)
 
-    def getLayers(self, layers: list[Layer]):
+    def _getLayers(self, layers: list[Layer]):
+        """
+        Создание слоев по запросу. Производит сборку зависимостей.
+
+        Параметры
+        ---------
+        `layers` - список содержащий слои запрашиваемые для сборки
+        """
         imageLayers: dict[Layer, cv2.Mat] = dict()
         deps: dict[Layer, cv2.Mat] = dict()
         for layer in layers:
             try:
-                deps = self.createLayerDepends(layer, deps)
+                deps = self._createLayerDepends(layer, deps)
             except (AttributeError, TypeError) as atr:
                 print(f"It is not possible to collect layer dependencies: {atr}")
 
@@ -70,7 +114,7 @@ class BasicImageProcessor():
                     imageLayers.update({layer: deps[layer]})
                 else:
                     imageLayers.update(
-                        {layer: self.getLayerInfo(layer).func(deps)})
+                        {layer: self._getLayerInfo(layer).func(deps)})
             except (AttributeError, TypeError) as atr:
                 print(f"Unable to assemble layer, function error: {atr}")
 
