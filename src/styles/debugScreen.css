@@ -111,34 +111,34 @@ SettingsModule {
     background-color: rgb(31, 41, 55);
 }
 
-QFrame#imViewFilters {
+QFrame#imViewLayer {
     background-color: rgb(31, 41, 55);
     border: none;
 }
 
-QScrollBar#imViewFilters:vertical {
+QScrollBar#imViewLayer:vertical {
 	border: none;
     background: rgb(31, 41, 55);
     width: 14px;
     margin: 0 0 0 0;
  }
 
-QScrollBar#imViewFilters::handle:vertical {	
+QScrollBar#imViewLayer::handle:vertical {	
 	min-height: 30px;
 	border-radius: 7px;
     background-color: qlineargradient(x1: 0, y1:0, x2:0, y2: 1, stop: 0 #4b5563, stop: 1 #374151);
     /* it's normal */
 }
 
-QScrollBar#imViewFilters::handle:vertical:hover, QScrollBar#imViewFilters::handle:vertical:pressed{	
+QScrollBar#imViewLayer::handle:vertical:hover, QScrollBar#imViewLayer::handle:vertical:pressed{	
 	background-color: #111827;
 }
 
-QScrollBar#imViewFilters::sub-line:vertical, QScrollBar#imViewFilters::add-line:vertical {
+QScrollBar#imViewLayer::sub-line:vertical, QScrollBar#imViewLayer::add-line:vertical {
 	border: none;
 	height: 0px;
 }
 
-QScrollBar#imViewFilters::up-arrow:vertical, QScrollBar#imViewFilters::down-arrow:vertical, QScrollBar#imViewFilters::add-page:vertical, QScrollBar#imViewFilters::sub-page:vertical {
+QScrollBar#imViewLayer::up-arrow:vertical, QScrollBar#imViewLayer::down-arrow:vertical, QScrollBar#imViewLayer::add-page:vertical, QScrollBar#imViewLayer::sub-page:vertical {
 	background: none;
 }

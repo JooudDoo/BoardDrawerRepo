@@ -11,7 +11,7 @@ from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLabel, QSizePolicy, QVBoxLayout, QPushButton, QFrame
 
-from components.DrawerModule import Filters
+from components.DrawerModule import Layer
 
 
 class FPSMeter(QLabel):
@@ -58,9 +58,11 @@ class FPSMeter(QLabel):
 
 class ImView(QFrame):
 
-    def __init__(self, fps: int = 30, name: str = "", metadata: str = None,  *args, **kwargs):
+    def __init__(self, fps: int = 30, name: str = "", metadata: str = None, isWorking=True,  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fps = fps
+        self.isWorking = isWorking
+
         self.mainLayout = QVBoxLayout(self)
         self.imageLabel = QLabel()
         sizePolicy = QSizePolicy(
@@ -77,14 +79,14 @@ class ImView(QFrame):
         self.updateTimer.setInterval(1000//self.fps)
         self.updateTimer.timeout.connect(self.updateImageFromQueue)
         self.imageQueue = Queue()
+        self.notLoadedCount = 0
         self.imageLoaded = True
 
         self.defaultImage = None
         self.getDefaultImage()
 
         self.metadata = metadata
-        self.isWorking = True
-        self.filters = []
+        self.Layer = []
 
         self.updateTimer.start()
 
@@ -93,8 +95,11 @@ class ImView(QFrame):
             return
         if self.imageQueue.empty():
             if self.imageLoaded:
-                self.setPixmap(self.getDefaultImage())
-                self.imageLoaded = False
+                if self.notLoadedCount >= 50:
+                    self.setPixmap(self.getDefaultImage())
+                    self.imageLoaded = False
+                    self.notLoadedCount = 0
+                self.notLoadedCount += 1
         else:
             self.setPixmap(self.toPixmap(self.imageQueue.get()))
         if self.imageQueue.qsize() >= self.fps:
@@ -103,6 +108,7 @@ class ImView(QFrame):
     def addImageToQueue(self, image):
         if image is None:
             return
+        self.notLoadedCount = 0
         self.imageLoaded = True
         self.imageQueue.put_nowait(image)
 
@@ -126,13 +132,13 @@ class ImView(QFrame):
             Qt.AspectRatioMode.KeepAspectRatio))
         self.FPSMeter.frameProcessed()
 
-    def addFilter(self, filter: Filters):
-        if filter not in self.filters:
-            self.filters.append(filter)
+    def addFilter(self, filter: Layer):
+        if filter not in self.Layer:
+            self.Layer.append(filter)
 
-    def removeFilter(self, filter: Filters):
-        if filter in self.filters:
-            self.filters.remove(filter)
+    def removeFilter(self, filter: Layer):
+        if filter in self.Layer:
+            self.Layer.remove(filter)
 
     def resizeEvent(self, a0: QtGui.QResizeEvent) -> None:
         super().resizeEvent(a0)
@@ -192,8 +198,8 @@ class ImViewWindow(QWidget):
     def setupUi(self):
         self._imView = self
         imViewLayout = QHBoxLayout(self._imView)
-        self.imView = ImView(fps=self.fps)
-        self.imView.addFilter(Filters.drawCanvas)
+        self.imView = ImView(fps=self.fps, isWorking=False)
+        self.imView.addFilter(Layer.drawCanvas)
         imViewLayout.addWidget(self.imView)
 
     def closeEvent(self, event):

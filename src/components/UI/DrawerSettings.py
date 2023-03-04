@@ -1,13 +1,13 @@
 
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QPushButton
 
-from components.DrawerModule import Drawer
+from components.DrawerModule import DebugImageProcessor
 from components.UI.StyleModules import SettingsModule
 
 
 class DrawerSettingsWidget(SettingsModule):
 
-    def __init__(self, drawer: Drawer, *args, **kwargs):
+    def __init__(self, drawer: DebugImageProcessor, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.drawer = drawer
 

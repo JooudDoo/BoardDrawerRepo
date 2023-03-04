@@ -1,4 +1,5 @@
 
+from typing import Callable
 from enum import Enum
 
 import cv2
@@ -8,84 +9,114 @@ from components.ColorContainers import RGB
 from components.CameraHandler import CameraHandler
 
 
-class Filters(Enum):
+class Layer(Enum):
     image = "image"
     laserMask = "laserMask"
     drawCanvas = "drawCanvas"
 
 
-def createImageFromLayers(layers: dict[Filters, cv2.Mat], filters: list[Filters]) -> cv2.Mat:
-    resultImage = None
-    for filter in filters:
-        resultImage = applyFilter(resultImage, layers[filter])
-    return resultImage
+class LayerInfo():
+    def __init__(self, layer: Layer, func: Callable, dependsOn: list[Layer] = []):
+        self.layer = layer
+        self._func = func
+        self.func = self.funcWrapper
+        self.dependsOn = dependsOn
+
+    def funcWrapper(self, layers: dict[Layer, cv2.Mat]) -> cv2.Mat:
+        deps: dict[Layer, cv2.Mat] = dict()
+        for depend in self.dependsOn:
+            deps.update({depend.value: layers.get(depend)})
+        return self._func(**deps)
 
 
-def applyFilter(img, layer):
-    if img is None:
-        return layer
-    else:
-        return Drawer.applyMask(img, layer)
+class BasicImageProcessor():
 
+    def __init__(self, camera: CameraHandler):
+        self.cameraHandler = camera
+        self.layersInfo: dict[Layer, LayerInfo] = dict()
 
-class Drawer():
+    def addLayerInfo(self, layerInfo: LayerInfo):
+        self.layersInfo.update({layerInfo.layer: layerInfo})
 
-    def __init__(self, camera: CameraHandler, defaultColor: RGB = RGB(0, 255, 255)):
-        self.camera = camera
-        self._draw: bool = False  # REDO
+    def getLayerInfo(self, layer: Layer):
+        return self.layersInfo.get(layer)
 
-        self.filters = [x for x in Filters]
+    def createLayerDepends(self, layer: Layer, depsIn: dict[Layer, cv2.Mat] = dict()):
+        deps: dict[Layer, cv2.Mat] = depsIn
+        for depend in self.getLayerInfo(layer).dependsOn:
+            if depend not in deps:
+                if self.getLayerInfo(depend).dependsOn == []:
+                    deps.update({depend: self.getLayerInfo(depend).func(deps)})
+                else:
+                    deps = self.createLayerDepends(depend, deps)
+                    deps.update({depend: self.getLayerInfo(depend).func(deps)})
+        return deps
 
-        self.defaultColor = defaultColor
-        self._save_x = 0
-        self._save_y = 0
-        self._drawCanvas = Drawer.createCanvas(self.camera.getFrame())
+    def __call__(self, layers: list[Layer]):
+        return self.getLayers(layers)
 
-    def swictchMaskShowMode(self):
-        self._showMask = not self._showMask
-        return self._showMask
-
-    # при смене состояния обновлять параметры рисовальщика (обрыв линии...)
-    def switchDrawMode(self):
-        self._draw = not self._draw
-        self._save_x = 0
-        self._save_y = 0
-        return self._draw
-
-    def drawer(self, size: tuple[int, int] = (0, 0)) -> dict[Filters, cv2.Mat]:
-        """
-        return all filter layers matched in self.filters
-        """
-        image = self.camera.getFrame(size)
-        laserMask = self.camera.getColorRangeMask(image)
-        drawCanvas = self.getMoments(laserMask)
-        laserMask = cv2.cvtColor(laserMask, cv2.COLOR_GRAY2BGR)
-        imageLayers = dict()
-        for filter in self.filters:
+    def getLayers(self, layers: list[Layer]):
+        imageLayers: dict[Layer, cv2.Mat] = dict()
+        deps: dict[Layer, cv2.Mat] = dict()
+        for layer in layers:
             try:
-                imageLayers.update({filter: locals()[filter.value]})
-            except KeyError as e:
-                print(f"Not found drawer layer: {e}")
+                deps = self.createLayerDepends(layer, deps)
+            except (AttributeError, TypeError) as atr:
+                print(f"It is not possible to collect layer dependencies: {atr}")
+
+        for layer in layers:
+            try:
+                if layer in deps:
+                    imageLayers.update({layer: deps[layer]})
+                else:
+                    imageLayers.update(
+                        {layer: self.getLayerInfo(layer).func(deps)})
+            except (AttributeError, TypeError) as atr:
+                print(f"Unable to assemble layer, function error: {atr}")
+
         return imageLayers
 
-    # переписать возможна смена размеров входного изображения
-    @staticmethod
-    def createCanvas(img):
+    def setCameraHandler(self, camera: CameraHandler):
+        self.cameraHandler = camera
+
+    @property
+    def cameraAttached(self):
+        return not self.cameraHandler is None
+
+
+class DebugImageProcessor(BasicImageProcessor):
+
+    def __init__(self, *args, **kwrgs):
+        super().__init__(*args, **kwrgs)
+        self.setupLayers()
+
+        self.defaultColor = RGB(0, 255, 255)
+        self._draw = False
+        self._save_x = 0
+        self._save_y = 0
+        if self.cameraAttached:
+            self._drawCanvas = self.createCanvas(self.cameraHandler.getFrame())
+
+    def createCanvas(self, img: cv2.Mat):
         h, w = img.shape[:2]
         return np.zeros((h, w, 3), np.uint8)
 
     def cleanCanvas(self):
         self._drawCanvas = np.zeros_like(self._drawCanvas)
 
-    @staticmethod
-    def applyMask(img, mask, weighted: bool = False, alpha: float = 0.6, gamma: float = 0.1):
-        if not weighted:
-            return cv2.add(img, mask)
-        beta = 1 - alpha
-        return cv2.addWeighted(img, alpha, mask, beta, gamma)
+    def setupLayers(self):
+        self.addLayerInfo(LayerInfo(Layer.image, self.cameraHandler.getFrame))
+        self.addLayerInfo(LayerInfo(Layer.laserMask, self.cameraHandler.getColorRangeMask, [Layer.image]))
+        self.addLayerInfo(LayerInfo(Layer.drawCanvas, self.getMoments, [Layer.laserMask]))
 
-    # Переписать и разделить на под функции
-    def getMoments(self, mask):
+    def switchDrawMode(self):
+        self._draw = not self._draw
+        self._save_x = 0
+        self._save_y = 0
+        return self._draw
+
+    def getMoments(self, laserMask: cv2.Mat):
+        mask = cv2.cvtColor(laserMask, cv2.COLOR_BGR2GRAY)
         if not self._draw:
             return self._drawCanvas
         moments = cv2.moments(mask, 1)
@@ -107,3 +138,24 @@ class Drawer():
         self._save_y = y
 
         return self._drawCanvas
+    
+
+def applyMask(img, mask, weighted: bool = False, alpha: float = 0.6, gamma: float = 0.1):
+    if not weighted:
+        return cv2.add(img, mask)
+    beta = 1 - alpha
+    return cv2.addWeighted(img, alpha, mask, beta, gamma)
+
+
+def createImageFromLayers(layers: dict[Layer, cv2.Mat], Layer: list[Layer]) -> cv2.Mat:
+    resultImage = None
+    for filter in Layer:
+        resultImage = applyFilter(resultImage, layers[filter])
+    return resultImage
+
+
+def applyFilter(img, layer):
+    if img is None:
+        return layer
+    else:
+        return applyMask(img, layer)

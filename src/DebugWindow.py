@@ -6,7 +6,7 @@ from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QFrame
 
 from components.CameraHandler import CameraHandler, CameraSettings
-from components.DrawerModule import Drawer, createImageFromLayers
+from components.DrawerModule import DebugImageProcessor, createImageFromLayers
 from components.UI.ImageViewer import ImView, ImViewSecurityWidget, ImViewWindow
 from components.UI.DrawerSettings import DrawerSettingsWidget
 from components.UI.CameraSettings import CameraSettingsWidget
@@ -25,7 +25,7 @@ class DebugWindow(QFrame):
         super().__init__(*args, **kwargs)
 
         self.camera = CameraHandler(settings='cache')
-        self.drawer = Drawer(self.camera)
+        self.drawer = DebugImageProcessor(camera=self.camera)
         self.imViews: list[ImView] = []
         self.createTimers()
 
@@ -49,25 +49,34 @@ class DebugWindow(QFrame):
         self.settingsBar = SettingsBar(self, self.camera, self.drawer)
         self.mainLayout.addWidget(self.settingsBar)
 
-    def createTimers(self, fps: int = 35):
+    def createTimers(self, fps: int = 32):
         self.fps = fps
         self.imageTimer = QTimer()
         self.imageTimer.timeout.connect(self.imViewsUpdate)
         self.imageTimer.setInterval(1000//self.fps)
+    
+    @property
+    def reqLayers(self):
+        layers = set()
+        for imView in self.imViews:
+            for layer in imView.Layer:
+                layers.add(layer)
+        return list(layers)
+
 
     @QtCore.pyqtSlot()
     def imViewsUpdate(self):
-        layers = self.drawer.drawer()
+        layers = self.drawer(self.reqLayers)
         for imView in self.imViews:
             if imView.isWorking:
                 th = Thread(target=lambda layers, imView: imView.addImageToQueue(
-                    createImageFromLayers(layers, imView.filters)), args=(layers, imView))
+                    createImageFromLayers(layers, imView.Layer)), args=(layers, imView))
                 th.start()
 
 
 class SettingsBar(QFrame):
 
-    def __init__(self, parent: DebugWindow, camera: CameraHandler, drawer: Drawer, *args, **kwargs):
+    def __init__(self, parent: DebugWindow, camera: CameraHandler, drawer: DebugImageProcessor, *args, **kwargs):
         super().__init__(parent=parent, *args, **kwargs)
         self.mainWindow = parent
         self.camera = camera

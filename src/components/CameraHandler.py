@@ -111,7 +111,7 @@ class CameraHandler():
         maskedFrame = self.applyMaskOnImage(frame, mask)
         return maskedFrame
 
-    def getColorRangeMask(self, img: cv2.Mat, reduceBy: int = None) -> cv2.Mat:
+    def getColorRangeMask(self, image: cv2.Mat) -> cv2.Mat:
         """
         Функция возвращающая маску заданного цветового диапазона. Значение маски берется из настроек
 
@@ -123,10 +123,9 @@ class CameraHandler():
 
         `return` - маска изображения
         """
-        if reduceBy == None:
-            reduceBy = self.settings.maskReduceBy
-        h, w, _ = img.shape
-        imgCopy = cv2.resize(img, (w//reduceBy, h//reduceBy))
+        reduceBy = self.settings.maskReduceBy
+        h, w, _ = image.shape
+        imgCopy = cv2.resize(image, (w//reduceBy, h//reduceBy))
         if self.settings.rangeType == "HSL":
             imgCopy = cv2.cvtColor(imgCopy, cv2.COLOR_BGR2HLS)
         imgCopy = cv2.GaussianBlur(imgCopy, (5, 5), 0)
@@ -134,7 +133,7 @@ class CameraHandler():
                            self.settings.maxRange.color)
         mask = cv2.dilate(mask, np.ones((2, 2)), iterations=3)
         mask = cv2.resize(mask, (w, h))
-        return mask
+        return cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
 
     @staticmethod
     def applyMaskOnImage(img: cv2.Mat, mask: cv2.Mat, alpha: float = 0.6, gamma: float = 0.1) -> cv2.Mat:

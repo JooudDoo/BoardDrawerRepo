@@ -6,7 +6,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QCheckBox, QGridLayout, QScrollArea, QFrame
 
 from components.UI.ImageViewer import ImViewSecurityWidget, ImView
-from components.DrawerModule import Filters
+from components.DrawerModule import Layer
 from components.UI.StyleModules import SettingsModule
 
 
@@ -44,17 +44,17 @@ class imViewTuner(QFrame):
     def imViewCheckBoxChanged(self):
         self.imViewStateChanger(self.imViewID)
 
-    def createImViewFiltersCheckBox(self, filters: list[Filters]):
+    def createImViewLayerCheckBox(self, Layer: list[Layer]):
 
-        checkBoxWidget = QFrame(objectName="imViewFilters")
+        checkBoxWidget = QFrame(objectName="imViewLayer")
         layout = QVBoxLayout(checkBoxWidget)
 
-        for filter in filters:
+        for filter in Layer:
             checkBox = FilterCheckBox(filter, self.imView)
             layout.addWidget(checkBox)
 
-        scrollArea = QScrollArea(objectName="imViewFilters")
-        scrollArea.verticalScrollBar().setObjectName("imViewFilters")
+        scrollArea = QScrollArea(objectName="imViewLayer")
+        scrollArea.verticalScrollBar().setObjectName("imViewLayer")
         scrollArea.setWidget(checkBoxWidget)
         return scrollArea
 
@@ -67,15 +67,15 @@ class imViewTuner(QFrame):
         self.imViewCheckBox.setText(f"Monitor {self.imViewID}")
         self.imViewCheckBox.stateChanged.connect(self.imViewCheckBoxChanged)
 
-        self.filters = self.createImViewFiltersCheckBox([x for x in Filters])
+        self.Layer = self.createImViewLayerCheckBox([x for x in Layer])
 
         self.mainLayout.addWidget(self.imViewCheckBox)
-        self.mainLayout.addWidget(self.filters)
+        self.mainLayout.addWidget(self.Layer)
 
 
 class FilterCheckBox(QCheckBox):
 
-    def __init__(self, filter: Filters, imView: ImView, *args, **kwargs):
+    def __init__(self, filter: Layer, imView: ImView, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.filter = filter
         self.imView = imView
