@@ -1,0 +1,144 @@
+TitleBar {
+    background-color: rgb(54, 157, 180);
+}
+
+DebugWindow#debugScreen {
+    background-color: rgb(11, 15, 25);
+}
+
+RangeSliderLabel#settingTitle {
+    color: white;
+}
+
+RangeSlider::handle:horizontal, RangeSlider::handle:vertical {
+    height: 18px;
+    border: 4px solid white;
+    border-radius: 9px;
+    width: 18px;
+    background: #0255b3;
+}
+
+RangeSlider::add-page:horizontal {
+    background: lightgrey;
+    border-top-right-radius: 9px;
+    border-bottom-right-radius: 9px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+RangeSlider::sub-page:horizontal {
+    background: #0075ff;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    border-top-left-radius: 9px;
+    border-bottom-left-radius: 9px;
+}
+
+RangeSlider::add-page:vertical {
+    background: #0075ff;
+    border-bottom-right-radius: 9px;
+    border-bottom-left-radius: 9px;
+}
+
+RangeSlider::sub-page:vertical {
+    background: lightgrey;
+    border-top-right-radius: 9px;
+    border-top-left-radius: 9px;
+}
+
+ImViewSecurityWidget#mainImViewers {
+    border: 1px solid;
+    border-color: rgb(55, 65, 81);
+    border-radius: 10%;
+    background-color: rgb(17, 24, 39);
+}
+
+ImView#security {
+    border: 1px solid rgb(55, 65, 81);
+    border-radius: 15%;
+}
+
+FPSMeter {
+    color: white
+}
+
+FilterCheckBox, QCheckBox#tunerMainCheckBox {
+    color: white;
+}
+
+FilterCheckBox::indicator:unchecked, QCheckBox#tunerMainCheckBox::indicator:unchecked  {
+    background-color: #111827;
+    border: 1px solid;
+    border-radius: 9px;
+}
+
+FilterCheckBox::indicator:checked, QCheckBox#tunerMainCheckBox::indicator:checked {
+    background-color: white;
+    border: 5px solid;
+    border-radius: 9px;
+}
+
+QPushButton#debugSettingsBtn {
+    color: white;
+    border: 1px solid;
+    border-radius: 9px;
+    height: 60px;
+    background-color: qlineargradient(x1: 0, y1:0, x2:0, y2: 1, stop: 0 #4b5563, stop: 1 #374151);
+    /* it's normal */
+}
+
+QPushButton#debugSettingsBtn:hover {
+    background-color: qlineargradient(x1: 0, y1:0, x2:0, y2: 1, stop: 0 #4a5461, stop: 1 #313a47);
+    /* it's normal */
+}
+
+QPushButton#debugSettingsBtn:pressed {
+    background-color: qlineargradient(x1: 0, y1:0, x2:0, y2: 1, stop: 0 #2f3641, stop: 1 #262f3b);
+    /* it's normal */
+}
+
+SettingsBar {
+    padding-top: 25%;
+    padding-bottom: 0%;
+    border: 3px solid;
+    border-color: rgb(55, 65, 81);
+    background-color: rgb(17, 24, 39);
+}
+
+SettingsModule {
+    border: 1px solid rgba(128, 128, 128, 0.1);
+    border-radius: 10%;
+    background-color: rgb(31, 41, 55);
+}
+
+QFrame#imViewLayer {
+    background-color: rgb(31, 41, 55);
+    border: none;
+}
+
+QScrollBar#imViewLayer:vertical {
+	border: none;
+    background: rgb(31, 41, 55);
+    width: 14px;
+    margin: 0 0 0 0;
+ }
+
+QScrollBar#imViewLayer::handle:vertical {	
+	min-height: 30px;
+	border-radius: 7px;
+    background-color: qlineargradient(x1: 0, y1:0, x2:0, y2: 1, stop: 0 #4b5563, stop: 1 #374151);
+    /* it's normal */
+}
+
+QScrollBar#imViewLayer::handle:vertical:hover, QScrollBar#imViewLayer::handle:vertical:pressed{	
+	background-color: #111827;
+}
+
+QScrollBar#imViewLayer::sub-line:vertical, QScrollBar#imViewLayer::add-line:vertical {
+	border: none;
+	height: 0px;
+}
+
+QScrollBar#imViewLayer::up-arrow:vertical, QScrollBar#imViewLayer::down-arrow:vertical, QScrollBar#imViewLayer::add-page:vertical, QScrollBar#imViewLayer::sub-page:vertical {
+	background: none;
+}
