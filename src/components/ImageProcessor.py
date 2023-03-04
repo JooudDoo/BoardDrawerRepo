@@ -182,6 +182,7 @@ class DebugImageProcessor(BasicImageProcessor):
         self._save_y = y
 
         return self._drawCanvas
+        
     
 
 def applyMask(img, mask, weighted: bool = False, alpha: float = 0.6, gamma: float = 0.1):
