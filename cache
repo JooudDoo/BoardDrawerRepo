@@ -1,4 +1,10 @@
-HSL
-50 80 147 
-77 230 241 
-5
+{
+  "reduce": {
+    "val": 5
+  },
+  "ranges": {
+    "rangeType": "HSL",
+    "minRange": "[H: 50, S: 80, L: 147]",
+    "maxRange": "[H: 77, S: 230, L: 241]"
+  }
+}

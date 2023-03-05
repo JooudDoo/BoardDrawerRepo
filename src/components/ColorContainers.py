@@ -1,5 +1,4 @@
-from contextlib import suppress
-
+import re
 
 class ColorContainer():
     def __init__():
@@ -21,6 +20,10 @@ class RGB(ColorContainer):
             self.red, self.green, self.blue = rgb[0], rgb[1], rgb[2]
         else:
             self.red, self.green, self.blue = red, green, blue
+
+    def fromString(self, val):
+        self.red, self.green, self.blue = list(map(int, re.findall(r"\d+", val)))
+        return self
 
     def _updateColorByName(self, color: str, val):
         setattr(self, color, val)
@@ -56,6 +59,10 @@ class HSL(ColorContainer):
         else:
             self.hue, self.saturation, self.lightness = hue, saturation, lightness
 
+    def fromString(self, val):
+        self.hue, self.saturation, self.lightness = list(map(int,re.findall(r"\d+", val)))
+        return self
+
     def _updateColorByName(self, color: str, val):
         setattr(self, color, val)
 
@@ -72,3 +79,12 @@ class HSL(ColorContainer):
 
     def maximizedString(self):
         return f"[H: 255, S: 255, L: 255]"
+
+
+availableContainers = {
+    "RGB": RGB,
+    "HSL": HSL,
+}
+
+def colorFromStr(tp : str, val : str):
+    return availableContainers[tp]().fromString(val)
