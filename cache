@@ -1,10 +1,10 @@
 {
   "reduce": {
-    "val": 5
+    "val": 2
   },
   "ranges": {
     "rangeType": "HSL",
-    "minRange": "[H: 50, S: 80, L: 147]",
-    "maxRange": "[H: 77, S: 230, L: 241]"
+    "minRange": "[H: 60, S: 90, L: 157]",
+    "maxRange": "[H: 87, S: 255, L: 231]"
   }
 }
