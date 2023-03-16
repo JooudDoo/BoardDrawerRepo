@@ -17,7 +17,6 @@ class RangeSlider(QSlider):
 
         self._updatefunction = lambda x: setattr(
             self._connectedValue, self._containerName, x)
-        
         self.setValue(getattr(self._connectedValue, self._containerName))
 
         if label is not None:
