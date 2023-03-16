@@ -89,10 +89,10 @@ class SettingsBar(QFrame):
     def updateModules(self):
         raise NotImplementedError()
         # TODO this feature
-        self.cameraSettings.insert(newSettings)
-        self.drawerSettingsWid.updateSettings(newSettings)
-        self.cameraSettingsWid.updateSettings(newSettings)
-        self.imViewsControlPanel.updateSettings(newSettings)
+        # self.cameraSettings.insert(newSettings)
+        # self.drawerSettingsWid.updateSettings(newSettings)
+        # self.cameraSettingsWid.updateSettings(newSettings)
+        # self.imViewsControlPanel.updateSettings(newSettings)
 
     def setupUI(self):
         self.mainLayout = QVBoxLayout(self)
