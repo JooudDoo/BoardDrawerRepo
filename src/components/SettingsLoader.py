@@ -119,10 +119,13 @@ class SettingsManager():
             self._settingList.append(settingName)
         if genMethod is not None:
             self.settingsGrid.update({settingName: genMethod})
-            self.__setattr__(settingName, genMethod(**data))
+            self.__setattr__(settingName, genMethod(**data)) 
         else:
             self.settingsGrid.update({settingName: DummySetting})
-            self.__setattr__(settingName, DummySetting(**data))
+            if type(data) is dict:
+                self.__setattr__(settingName, DummySetting(**data))
+            else:
+                self.__setattr__(settingName, DummySetting(data))
 
     @property
     def settingsList(self):
