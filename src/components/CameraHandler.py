@@ -72,10 +72,17 @@ class CameraHandler():
 
     def __init__(self, videoStreamSource=0, settings: CameraSettings | str = None):
         self._videoStream = VideoStream(src=videoStreamSource).start()
-        if type(settings) == str:
-            self.loadSettings(settings)
+
+        frame = self._videoStream.read()
+        if frame is None:
+            self.status = 500
+            print("Не удалось получить кадр из видеопотока")
         else:
-            self.setupSettings(settings)
+            self.status = 200
+            if type(settings) == str:
+                self.loadSettings(settings)
+            else:
+                self.setupSettings(settings)
 
     def setupSettings(self, settings: CameraSettings):
         if settings == None:

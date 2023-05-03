@@ -141,24 +141,29 @@ class DebugImageProcessor(BasicImageProcessor):
         if self.cameraAttached:
             self._drawCanvas = self.createCanvas(self.cameraHandler.getFrame())
 
+    # создать холст
     def createCanvas(self, img: cv2.Mat):
         h, w = img.shape[:2]
         return np.zeros((h, w, 3), np.uint8)
 
+    # почистить холст 
     def cleanCanvas(self):
         self._drawCanvas = np.zeros_like(self._drawCanvas)
 
+    # добавление линий
     def setupLayers(self):
         self.addLayerInfo(LayerInfo(Layer.image, self.cameraHandler.getFrame))
         self.addLayerInfo(LayerInfo(Layer.laserMask, self.cameraHandler.getColorRangeMask, [Layer.image]))
         self.addLayerInfo(LayerInfo(Layer.drawCanvas, self.getMoments, [Layer.laserMask]))
 
+    # переключатель отрисовки
     def switchDrawMode(self):
         self._draw = not self._draw
         self._save_x = 0
         self._save_y = 0
         return self._draw
 
+    # поиск середины координат цвета и отрисовка на экране
     def getMoments(self, laserMask: cv2.Mat):
         mask = cv2.cvtColor(laserMask, cv2.COLOR_BGR2GRAY)
         if not self._draw:

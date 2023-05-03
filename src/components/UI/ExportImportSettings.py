@@ -24,7 +24,8 @@ class ExportImportFrame(SettingsModule):
         importSettingsBtn = QPushButton(
             text='Import', objectName="debugSettingsBtn")
 
-        def saveSettingsFunc(): return CameraSettings.exportTo(self.cameraSettings, 'cache')
+        def saveSettingsFunc(): return CameraSettings.exportTo(
+            self.cameraSettings, './../../cache')
         saveSettingsBtn.clicked.connect(saveSettingsFunc)
         exportSettingsBtn.clicked.connect(self.exporSettingsBtnF)
         importSettingsBtn.clicked.connect(self.importSettingsBtnF)
