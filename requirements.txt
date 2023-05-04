@@ -1,0 +1,9 @@
+﻿autopep8==2.0.1
+imutils==0.5.4
+numpy==1.24.2
+opencv-python==4.7.0.68
+pycodestyle==2.10.0
+PyQt6==6.4.2
+PyQt6-Qt6==6.4.2
+PyQt6-sip==13.4.1
+six==1.16.0
