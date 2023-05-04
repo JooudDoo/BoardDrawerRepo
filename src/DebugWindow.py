@@ -5,7 +5,8 @@ from PyQt6 import QtCore
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QFrame
 
-from components.CameraHandler import CameraHandler, CameraSettings
+from components.CameraHandler import CameraHandler
+from components.SettingsLoader import SettingsManager
 from components.ImageProcessor import DebugImageProcessor, createImageFromLayers
 from components.UI.ImageViewer import ImView, ImViewSecurityWidget, ImViewWindow
 from components.UI.DrawerSettings import DrawerSettingsWidget
@@ -49,7 +50,7 @@ class DebugWindow(QFrame):
             self.fps, self.imViews, objectName="mainImViewers")
         self.mainLayout.addWidget(self.imViewsContainer, stretch=3)
 
-        self.settingsBar = SettingsBar(self, self.camera, self.drawer)
+        self.settingsBar = SettingsBar(self, self.settingsManager, self.camera, self.drawer)
         self.mainLayout.addWidget(self.settingsBar)
 
     # создать таймер
@@ -79,22 +80,23 @@ class DebugWindow(QFrame):
 
 class SettingsBar(QFrame):
 
-    def __init__(self, parent: DebugWindow, camera: CameraHandler, drawer: DebugImageProcessor, *args, **kwargs):
+    def __init__(self, parent, settingManager : SettingsManager, camera: CameraHandler, drawer: DebugImageProcessor, *args, **kwargs):
         super().__init__(parent=parent, *args, **kwargs)
         self.mainWindow = parent
         self.camera = camera
         self.drawer = drawer
 
-        self.cameraSettings: CameraSettings = camera.settings
+        self.settingsManager: SettingsManager = settingManager
         self.setupUI()
 
     # обновляем модули настроек
-    def updateModules(self, newSettings: CameraSettings):
+    def updateModules(self):
+        raise NotImplementedError()
         # TODO this feature
-        self.cameraSettings.insert(newSettings)
-        self.drawerSettingsWid.updateSettings(newSettings)
-        self.cameraSettingsWid.updateSettings(newSettings)
-        self.imViewsControlPanel.updateSettings(newSettings)
+        # self.cameraSettings.insert(newSettings)
+        # self.drawerSettingsWid.updateSettings(newSettings)
+        # self.cameraSettingsWid.updateSettings(newSettings)
+        # self.imViewsControlPanel.updateSettings(newSettings)
 
     # создаем и загружаем виджеты
     def setupUI(self):
@@ -105,15 +107,15 @@ class SettingsBar(QFrame):
         self.mainWindow.imViews.append(self.separeteImView.imView)
         self.separeteImViewBtn = self.separeteImView.createSwitchBtn()
 
-        self.drawerSettingsWid = DrawerSettingsWidget(self.drawer)
+        self.drawerSettingsWid = DrawerSettingsWidget(drawer=self.drawer, settingsManager=self.settingsManager)
 
-        self.cameraSettingsWid = CameraSettingsWidget(self.camera)
+        self.cameraSettingsWid = CameraSettingsWidget(camera=self.camera, settingsManager=self.settingsManager)
 
         self.imViewsControlPanel = imViewControlPanel(
             self.mainWindow.imViewsContainer)
 
         self.settingsImExBtns = ExportImportFrame(
-            self.cameraSettings, self.updateModules)
+            self.settingsManager, self.updateModules)
 
         self.mainLayout.addWidget(
             self.separeteImViewBtn, Qt.AlignmentFlag.AlignCenter)

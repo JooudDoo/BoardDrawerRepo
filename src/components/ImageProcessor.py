@@ -5,7 +5,8 @@ from enum import Enum
 import cv2
 import numpy as np
 
-from components.ColorContainers import RGB
+from components.ColorContainers import RGB, HSL
+from components.SettingsLoader import SettingsManager, ColorRangeSettings
 from components.CameraHandler import CameraHandler
 
 
@@ -130,8 +131,10 @@ class BasicImageProcessor():
 
 class DebugImageProcessor(BasicImageProcessor):
 
-    def __init__(self, *args, **kwrgs):
+    def __init__(self, settingManager : SettingsManager, *args, **kwrgs):
         super().__init__(*args, **kwrgs)
+        self.settingManager =  settingManager
+        self.checkSettings()
         self.setupLayers()
 
         self.defaultColor = RGB(0, 255, 255)
@@ -141,7 +144,17 @@ class DebugImageProcessor(BasicImageProcessor):
         if self.cameraAttached:
             self._drawCanvas = self.createCanvas(self.cameraHandler.getFrame())
 
-    # создать холст
+    def setupLayers(self):
+        self.addLayerInfo(LayerInfo(Layer.image, self.cameraHandler.getFrame))
+        self.addLayerInfo(LayerInfo(Layer.laserMask, self.getColorRangeMask, [Layer.image]))
+        self.addLayerInfo(LayerInfo(Layer.drawCanvas, self.getMoments, [Layer.laserMask]))
+    
+    def checkSettings(self):
+        if self.settingManager.getSetting("reduce") is None:
+            self.settingManager.addSetting("reduce", 5)
+        if self.settingManager.getSetting("ranges") is None:
+            self.settingManager.addSetting('ranges', ColorRangeSettings("HSL", HSL(0,0,0), HSL(255,255,255)), ColorRangeSettings)
+
     def createCanvas(self, img: cv2.Mat):
         h, w = img.shape[:2]
         return np.zeros((h, w, 3), np.uint8)
@@ -149,12 +162,6 @@ class DebugImageProcessor(BasicImageProcessor):
     # почистить холст 
     def cleanCanvas(self):
         self._drawCanvas = np.zeros_like(self._drawCanvas)
-
-    # добавление линий
-    def setupLayers(self):
-        self.addLayerInfo(LayerInfo(Layer.image, self.cameraHandler.getFrame))
-        self.addLayerInfo(LayerInfo(Layer.laserMask, self.cameraHandler.getColorRangeMask, [Layer.image]))
-        self.addLayerInfo(LayerInfo(Layer.drawCanvas, self.getMoments, [Layer.laserMask]))
 
     # переключатель отрисовки
     def switchDrawMode(self):
@@ -164,6 +171,22 @@ class DebugImageProcessor(BasicImageProcessor):
         return self._draw
 
     # поиск середины координат цвета и отрисовка на экране
+    def getColorRangeMask(self, image: cv2.Mat) -> cv2.Mat:
+        reduceBy = self.settingManager.getSetting("reduce").val
+        minRange = self.settingManager.getSetting("ranges").minRange
+        maxRange = self.settingManager.getSetting("ranges").maxRange
+        
+        h, w, _ = image.shape
+        imgCopy = cv2.resize(image, (w//reduceBy, h//reduceBy))
+        if self.settingManager.getSetting("ranges").rangeType == "HSL":
+            imgCopy = cv2.cvtColor(imgCopy, cv2.COLOR_BGR2HLS)
+        imgCopy = cv2.GaussianBlur(imgCopy, (5, 5), 0)
+        mask = cv2.inRange(imgCopy, minRange.color,
+                           maxRange.color)
+        mask = cv2.dilate(mask, np.ones((2, 2)), iterations=3)
+        mask = cv2.resize(mask, (w, h))
+        return cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
+
     def getMoments(self, laserMask: cv2.Mat):
         mask = cv2.cvtColor(laserMask, cv2.COLOR_BGR2GRAY)
         if not self._draw:
