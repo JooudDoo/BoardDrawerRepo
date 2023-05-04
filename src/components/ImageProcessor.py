@@ -159,15 +159,18 @@ class DebugImageProcessor(BasicImageProcessor):
         h, w = img.shape[:2]
         return np.zeros((h, w, 3), np.uint8)
 
+    # почистить холст 
     def cleanCanvas(self):
         self._drawCanvas = np.zeros_like(self._drawCanvas)
 
+    # переключатель отрисовки
     def switchDrawMode(self):
         self._draw = not self._draw
         self._save_x = 0
         self._save_y = 0
         return self._draw
 
+    # поиск середины координат цвета и отрисовка на экране
     def getColorRangeMask(self, image: cv2.Mat) -> cv2.Mat:
         reduceBy = self.settingManager.getSetting("reduce").val
         minRange = self.settingManager.getSetting("ranges").minRange

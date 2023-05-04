@@ -25,6 +25,7 @@ class ExportImportFrame(SettingsModule):
             text='Import', objectName="debugSettingsBtn")
 
         def saveSettingsFunc(): return self.settingsManager.exportSettingsToJSON('cache')
+
         saveSettingsBtn.clicked.connect(saveSettingsFunc)
         exportSettingsBtn.clicked.connect(self.exporSettingsBtnF)
         importSettingsBtn.clicked.connect(self.importSettingsBtnF)

@@ -7,6 +7,11 @@ class CameraHandler():
     def __init__(self, videoStreamSource=0):
         self._videoStream = VideoStream(src=videoStreamSource).start()
 
+        frame = self._videoStream.read()
+        if frame is None:
+            self.status = 500
+            print("Не удалось получить кадр из видеопотока")
+
     def getFrame(self, size: tuple[int, int] = (0, 0)):
         frame = self._videoStream.read()
         # if not checkCode:

@@ -22,24 +22,26 @@ def runWindow():
 
 class DebugWindow(QFrame):
 
-    def __init__(self, fps : int = 32, *args, **kwargs):
+    def __init__(self, fps: int = 32, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.settingsManager = SettingsManager("cache")
-        self.camera = CameraHandler()
-        self.drawer = DebugImageProcessor(settingManager=self.settingsManager,camera=self.camera)
         self.imViews: list[ImView] = []
         self.createTimers(fps=fps)
-
         self.setObjectName("debugScreen")
-        self.setupUI()
         self.setupStyles()
         self.imageTimer.start()
 
+        self.camera = CameraHandler(settings='cache')
+        if self.camera.status == 200:
+            self.drawer = DebugImageProcessor(camera=self.camera)
+            self.setupUI()
+
+    # загрузка стилей
     def setupStyles(self):
         with open("src/styles/debugScreen.css", 'r') as style:
             self.setStyleSheet(style.read())
 
+    # загрузка интерфейса
     def setupUI(self):
         self.mainWidget = self
         self.mainLayout = QHBoxLayout(self)
@@ -51,6 +53,7 @@ class DebugWindow(QFrame):
         self.settingsBar = SettingsBar(self, self.settingsManager, self.camera, self.drawer)
         self.mainLayout.addWidget(self.settingsBar)
 
+    # создать таймер
     def createTimers(self, fps: int):
         self.fps = fps
         self.imageTimer = QTimer()
@@ -86,6 +89,7 @@ class SettingsBar(QFrame):
         self.settingsManager: SettingsManager = settingManager
         self.setupUI()
 
+    # обновляем модули настроек
     def updateModules(self):
         raise NotImplementedError()
         # TODO this feature
@@ -94,6 +98,7 @@ class SettingsBar(QFrame):
         # self.cameraSettingsWid.updateSettings(newSettings)
         # self.imViewsControlPanel.updateSettings(newSettings)
 
+    # создаем и загружаем виджеты
     def setupUI(self):
         self.mainLayout = QVBoxLayout(self)
         self.mainLayout.setSpacing(25)
