@@ -7,6 +7,7 @@ class CameraHandler():
     def __init__(self, videoStreamSource=0):
         self._videoStream = VideoStream(src=videoStreamSource).start()
 
+        self.status = 200
         frame = self._videoStream.read()
         if frame is None:
             self.status = 500
