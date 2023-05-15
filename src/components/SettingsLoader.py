@@ -56,6 +56,18 @@ class SettingsManager():
 
     defaultSaveName = "cache"
 
+    defaultSettingsData =\
+"""{
+  "reduce": {
+    "val": 2
+  },
+  "ranges": {
+    "rangeType": "HSL",
+    "minRange": "[H: 60, S: 90, L: 157]",
+    "maxRange": "[H: 87, S: 255, L: 231]"
+  }
+}"""
+
     def __init__(self, settingsFile: str = None):
         self._settingList = []
         self.settingFile = settingsFile
@@ -68,16 +80,17 @@ class SettingsManager():
         self.exportSettingsToJSON(self.settingFile)
 
     def importSettingsFromJSON(self, filePath: str):
-        with open(filePath, 'r', encoding='utf8') as f:
-            try:
+        try:
+            with open(filePath, 'r', encoding='utf8') as f:
                 settingsJSON = json.loads(f.read())
-            except json.decoder.JSONDecodeError:
-                print(f"Couldn't read file: {filePath}")
-                print(f"Create empty settings file: {filePath}_tmp")
-                self.settingFile = filePath+"_tmp"
-                with open(filePath+"_tmp", 'w', encoding='utf8') as f:
-                    pass
-                return
+        except:
+            print(f"Couldn't read file: {filePath}")
+            print(f"Create empty settings file: {filePath}")
+            self.settingFile = filePath
+            with open(filePath, 'w', encoding='utf8') as f:
+                f.write(self.defaultSettingsData)
+            self.importSettingsFromJSON(filePath)
+            return
         self._settingList = []
         for key, value in settingsJSON.items():
             genMethod = self.settingsGrid.get(key, None)

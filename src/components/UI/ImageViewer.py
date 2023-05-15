@@ -1,5 +1,6 @@
 
 from queue import Queue
+from os.path import join as pjoin
 
 import cv2
 import numpy as np
@@ -11,7 +12,9 @@ from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLabel, QSizePolicy, QVBoxLayout, QPushButton, QFrame
 
 from components.ImageProcessor import Layer
+from components import resource_path
 
+ASSETS_FOLDER_PATH = resource_path("assets")
 
 class FPSMeter(QLabel):
     def __init__(self,  *args, **kwargs):
@@ -118,7 +121,7 @@ class ImView(QFrame):
     def getDefaultImage(self):
         if self.defaultImage is None:
             try:
-                self.defaultImage = QtGui.QPixmap("assets/defaultImage.jpg")
+                self.defaultImage = QtGui.QPixmap(pjoin(ASSETS_FOLDER_PATH, "defaultImage.jpg"))
             except:
                 self.defaultImage = QtGui.QImage(np.zeros(
                     (360, 360, 3)).data, 360, 360, QtGui.QImage.Format.Format_RGB888).rgbSwapped()

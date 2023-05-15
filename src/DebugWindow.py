@@ -1,10 +1,12 @@
 
 from threading import Thread
+from os.path import join as pjoin
 
 from PyQt6 import QtCore
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QFrame
 
+from components import resource_path
 from components import CameraHandler
 from components import SettingsManager
 from components import DebugImageProcessor, createImageFromLayers
@@ -14,11 +16,11 @@ from components.UI import CameraSettingsWidget
 from components.UI import ExportImportFrame
 from components.UI import imViewControlPanel
 
+ASSETS_FOLDER_PATH = resource_path("assets")
 
 def runWindow():
     window = DebugWindow()
     window.show()
-
 
 class DebugWindow(QFrame):
 
@@ -37,7 +39,7 @@ class DebugWindow(QFrame):
         self.imageTimer.start()
 
     def setupStyles(self):
-        with open("src/styles/debugScreen.css", 'r') as style:
+        with open(pjoin(ASSETS_FOLDER_PATH, "styles/debugScreen.css")) as style:
             self.setStyleSheet(style.read())
 
     def setupUI(self):
