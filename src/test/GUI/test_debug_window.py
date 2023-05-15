@@ -65,6 +65,8 @@ class TestDebugWindow(unittest.TestCase):
         window.imageTimer
         mock_start.assert_called_once()
 
+def run_tests():
+    unittest.main()
 
 if __name__ == '__main__':
-    unittest.main()
+    run_tests()

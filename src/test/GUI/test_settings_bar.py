@@ -46,6 +46,8 @@ class TestSettingsBar(unittest.TestCase):
                 assert debug_window.settingsBar.layout() is not None
         return True
 
+def run_tests():
+     unittest.main()
 
 if __name__ == '__main__':
-    unittest.main()
+    run_tests()
