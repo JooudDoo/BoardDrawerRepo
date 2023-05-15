@@ -50,8 +50,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: "RGB_BoardDrawer_release_windows"
-        release_name: "RGB BoardDrawer ${{ github.event.head_commit.message }}"
+        tag_name: "RGB_BoardDrawer_release_windows_${{ github.event.head_commit.id }}"
+        release_name: "RGB BoardDrawer (${{ github.event.head_commit.message }})"
         overwrite: true
         body: |
           Release windows version
@@ -107,8 +107,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: "RGB_BoardDrawer_release_ubuntu"
-          release_name: "RGB BoardDrawer ${{ github.event.head_commit.message }}"
+          tag_name: "RGB_BoardDrawer_release_ubuntu_${{ github.event.head_commit.id }}"
+          release_name: "RGB BoardDrawer (${{ github.event.head_commit.message }})"
           overwrite: true
           body: |
             Release ubuntu version
