@@ -43,7 +43,7 @@ jobs:
       with:
           name: Windows_RGB BoardDrawer
           path: "dist/RGB BoardDrawer.exe"
-    - name: create release
+    - name: Create release
       id: create_release
       uses: actions/create-release@v1
       env:
