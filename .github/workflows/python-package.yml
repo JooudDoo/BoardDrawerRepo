@@ -38,7 +38,11 @@ jobs:
         python src/test/test_maintainer.py
     - name: Run PyInstaller
       run: |
-        python -m pyinstaller --onefile --add-data "assets;assets" src/main.py --name "RGB BoardDrawer"
+        python -m PyInstaller --onefile --add-data "assets;assets" src/main.py --name "RGB BoardDrawer"
+    - uses: actions/upload-artifact@v2
+      with:
+          name: Windows_RGB BoardDrawer
+          path: "dist/RGB BoardDrawer.exe"
     - name: create release
       id: create_release
       uses: actions/create-release@v1
