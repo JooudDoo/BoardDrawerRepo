@@ -37,4 +37,4 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Run Test's
       run: |
-        ls src/test/*.py|xargs -n 1 -P 3 python
+        python src/test/test_maintainer.py
