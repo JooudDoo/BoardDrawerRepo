@@ -49,8 +49,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: "RGB_BoardDrawer_release"
-        release_name: "RGB BoardDrawer release"
+        tag_name: "RGB_BoardDrawer_release_windows"
+        release_name: "RGB BoardDrawer ${{ github.event.head_commit.message }}"
         overwrite: true
         body: |
           Test Release v1.0.0
@@ -66,3 +66,59 @@ jobs:
         asset_path: "dist/RGB BoardDrawer.exe"
         asset_name: "RGB BoardDrawer.exe"
         asset_content_type: application/zip
+  build-ubuntu:
+      runs-on: ubuntu-latest
+      strategy:
+        fail-fast: false
+        matrix:
+          python-version: ["3.10"]
+      steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install flake8 pytest
+          python -m pip install -r requirements.txt
+      - name: Lint with flake8
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      - name: Run Test's
+        run: |
+          python src/test/test_maintainer.py
+      - name: Run PyInstaller
+        run: |
+          python -m PyInstaller --onefile --add-data "assets;assets" src/main.py --name "RGB BoardDrawer"
+      - uses: actions/upload-artifact@v2
+        with:
+            name: Ubuntu_RGB BoardDrawer
+            path: "dist/RGB BoardDrawer"
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "RGB_BoardDrawer_release_ubuntu"
+          release_name: "RGB BoardDrawer ${{ github.event.head_commit.message }}"
+          overwrite: true
+          body: |
+            Test Release v1.0.0
+          draft: false
+          prerelease: false
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{steps.create_release.outputs.upload_url}}
+          asset_path: "dist/RGB BoardDrawer"
+          asset_name: "RGB BoardDrawer"
+          asset_content_type: application/zip
