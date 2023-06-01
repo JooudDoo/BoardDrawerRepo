@@ -7,12 +7,12 @@ from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QFrame
 
 from components import resource_path
-from components import CameraHandler
+from components import VideoHandler
 from components import SettingsManager
 from components import DebugImageProcessor, createImageFromLayers
 from components.UI import ImView, ImViewSecurityWidget, ImViewWindow
 from components.UI import DrawerSettingsWidget
-from components.UI import CameraSettingsWidget
+from components.UI import VideoSettingsWidget
 from components.UI import ExportImportFrame
 from components.UI import imViewControlPanel
 
@@ -28,7 +28,7 @@ class DebugWindow(QFrame):
         super().__init__(*args, **kwargs)
 
         self.settingsManager = SettingsManager("cache")
-        self.camera = CameraHandler()
+        self.camera = VideoHandler(videoStreamSource=0)
         self.drawer = DebugImageProcessor(settingManager=self.settingsManager,camera=self.camera)
         self.imViews: list[ImView] = []
         self.createTimers(fps=fps)
@@ -79,7 +79,7 @@ class DebugWindow(QFrame):
 
 class SettingsBar(QFrame):
 
-    def __init__(self, parent, settingManager : SettingsManager, camera: CameraHandler, drawer: DebugImageProcessor, *args, **kwargs):
+    def __init__(self, parent, settingManager : SettingsManager, camera: VideoHandler, drawer: DebugImageProcessor, *args, **kwargs):
         super().__init__(parent=parent, *args, **kwargs)
         self.mainWindow = parent
         self.camera = camera
@@ -106,7 +106,7 @@ class SettingsBar(QFrame):
 
         self.drawerSettingsWid = DrawerSettingsWidget(drawer=self.drawer, settingsManager=self.settingsManager)
 
-        self.cameraSettingsWid = CameraSettingsWidget(camera=self.camera, settingsManager=self.settingsManager)
+        self.cameraSettingsWid = VideoSettingsWidget(videoHandler=self.camera, settingsManager=self.settingsManager)
 
         self.imViewsControlPanel = imViewControlPanel(
             self.mainWindow.imViewsContainer)

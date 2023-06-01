@@ -1,4 +1,5 @@
-from .CameraHandler import CameraHandler
+from .VideoHandler import *
+from .CameraHandler import *
 from .ColorContainers import *
 from .ImageProcessor import *
 from .SettingsLoader import *

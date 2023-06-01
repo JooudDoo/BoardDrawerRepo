@@ -1,4 +1,4 @@
-from .CameraSettings import *
+from .VideoSettings import *
 from .DrawerSettings import *
 from .ExportImportSettings import *
 from .ImageViewer import *

@@ -9,7 +9,7 @@ sys.path.insert(1, 'src/')
 from DebugWindow import DebugWindow
 
 from components.UI.DrawerSettings import DrawerSettingsWidget
-from components.UI.CameraSettings import CameraSettingsWidget
+from UI.VideoSettings import VideoSettingsWidget
 from components.UI.ExportImportSettings import ExportImportFrame
 from components.UI.ImageViewerControlPanel import imViewControlPanel
 
@@ -40,7 +40,7 @@ class TestSettingsBar(unittest.TestCase):
         debug_window = DebugWindow()
         if debug_window.camera.status == 200:
                 assert isinstance(debug_window.settingsBar.drawerSettingsWid, DrawerSettingsWidget)
-                assert isinstance(debug_window.settingsBar.cameraSettingsWid, CameraSettingsWidget)
+                assert isinstance(debug_window.settingsBar.cameraSettingsWid, VideoSettingsWidget)
                 assert isinstance(debug_window.settingsBar.imViewsControlPanel, imViewControlPanel)
                 assert isinstance(debug_window.settingsBar.settingsImExBtns, ExportImportFrame)
                 assert debug_window.settingsBar.layout() is not None
